@@ -1,0 +1,71 @@
+< 첫 서버를 만들어보자 >
+
+서버는 컴퓨터다 우리의 맥북, 윈도우즈같은 인터넷에 연결된 컴퓨터다.
+
+소프트웨어적인 서버는 인터넷에 연결된 한 덩어리의 코드다. 
+
+일종의 네트워크에 연결된, URL에 응답하고 접속을 허락하는 일을 하는게 기본이다.
+
+내가 이페이지를 요청하면 어딘가에 있는 서버에 저장된 웹사이트가 나에게 보내주는 것.
+
+정리하면 물리적으로는 늘 켜져있는 컴퓨터라는 의미. 다른 의미로는 인터넷에 연결된 내접속 요청에
+
+응답하는 컴퓨터이다. 중요한건 서버란 접속을 받아주는 무언가다.
+
+===========================================
+
+Express.js 는 프레임워크야. 그 의미는, 아주 많은 코드로 우리가 원하는 걸 쉽고 빠르게
+
+해낼 수 있게 만들어둔 걸 말한다. 
+
+예를 들어 node.js로 서버를 만드는거라면 수작업으로 좀 해줄게 있다.
+
+우리 목표가 node.js로 서버를 만드는것이라면. (express를 사용할 수 있다)
+
+몇 줄의 코드로 서버를 만들 수 있다는게 기본적으로 프레임코드야. 우리가 원하는걸 빠르게 만들 수 있다.
+
+express의 경우 node.js에서 작동하는 프레임워크이다.
+
+===========================================
+
+ex) index.js 내용은 console.log("hi") , 터미널에서 node index.js를 하면 hi가 출력.
+
+NPM = Node Package Manager
+
+< vsc 내에서 NPM 설치방법 > 
+
+Node.js 다운받을 때 NPM도 같이 설치됨.
+
+npm으로 프로젝트를 시작하려면 npm이 정한 방식으로 시작해야한다.
+
+(1) TERMINAL -> npm init -> package name 입력(이 경우 나의 웹사이트가 package이다.(enter) ->
+버전확인 (enter) -> description: 입력 (enter) -> entry point, test command, git repository, keywords (enter) 해서 넘기고 ->
+author : 내이름 (enter) -> (enter) -> Is this OK? 가나오면 y or yes 치면 package.json 생성됨.
+(scripts지우기 ) 영상에선 지웠음.
+
+Javascript에서 정보를 담는 방식일뿐. Json은 JavaScript에서 정보를 담는 방식이다.
+
+===================================================
+
+< express 설치 >
+
+npm을 실행할 때는 꼭 프로젝트 폴더에 package.json이있는 폴더에서 실행해야한다. 
+
+package.json이 없는 폴더에서 실행하면 package.json을 읽지 못해서 package.json을 또 다른곳에 설치해버린다.
+
+위와같은 주의사항을 인지하고 설치한다.
+
+-> npm install express
+
+node_module이 다운로드 됐을거다. NPM을 통해 
+
+그리고 package.json에 우리는 dependency를 가지게된다. 이게 우리 프로젝트가 생존하는 방식이다.
+
+package.json을 가지고있는것은 아주 좋은 것이다. 친구와 협업을 할 때, node_modules 폴더를 다 건내줄 필요가 없다.
+
+※  node_modules가 없다고 가정할 때, 터미널에 npm install이라고 치면 자동으로 dependecy를 찾아서 다운하게 된다.
+
+
+=================================================
+
+

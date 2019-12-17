@@ -1,0 +1,11 @@
+{
+  "name": "wetube",
+  "version": "1.0.0",
+  "description": "LESA install ExpressJS",
+  "main": "index.js",
+  "author": "LESANF",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
