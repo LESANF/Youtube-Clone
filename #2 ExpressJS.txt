@@ -65,7 +65,66 @@ package.json을 가지고있는것은 아주 좋은 것이다. 친구와 협업�
 
 ※  node_modules가 없다고 가정할 때, 터미널에 npm install이라고 치면 자동으로 dependecy를 찾아서 다운하게 된다.
 
+git에 올려야 되기때문에 현재위치에서 git init을함.
+
+github에 올리기전. node_modules의 양이엄청나기 때문에 ignore처리를 해줘야한다. github에는 내가 작성한 코드만 올리고싶기 때문이다.
+
+< ignore 처리하는 방법 >
+
+1. .gitignore 파일 생성.
+
+2. google에 gitignore nodejs로 검색
+-> https://github.com/github/gitignore/blob/master/Node.gitignore
+
+3. 위내용을 복사해서 .gitignore에 붙여넣기.
+
+4. package-lock.json 파일을 .gitignore에 추가로 적어주기 (package에 대한 보안과 관련되어있기때문)
+
 
 =================================================
 
+/* window에서 cmd가아닌 git bash를 통해 github에 push하는 법. */
 
+https://git-scm.com/downloads 다운 
+
+https://mishka.kr/2019/06/24/vscode-gitbash/  
+-> VSC내부에서 터미널을 bash로 바꾸는 방법.
+
+ $ git config --global user.email 
+ $ git config --global user.name 
+
+최초1회 등록. 
+
+1. 저장할 때는 해당폴더에 들어가서 bash에 git init 작성시 준비완료.
+
+2. git init이 완료되었으면, github으로 가서 repository를 만듦
+
+3. github에 만들어진 repo안에 clone주소를 복사함. ( bash에선 붙여넣기가 shift + ins )
+
+4. add remote origin https://~~~클론주소. (enter)
+
+5. git add . (add와 . 사이 공백있음)
+
+6. git commit -m "text"
+
+7 git push origin master  
+
+==================================================
+
+< express 시작 >
+
+https://expressjs.com/en/guide/routing.html    (expressJS 홈페이지)
+
+메뉴에 Guide -> Routing 
+
+-------------------------------------------------------------------------------------
+var express = require('express')
+var app = express()
+
+// respond with "hello world" when a GET request is made to the homepage
+app.get('/', function (req, res) {
+  res.send('hello world')
+})
+--------------------------------------------------------------------------------------
+
+var를 const로 바꿔서 작성.
