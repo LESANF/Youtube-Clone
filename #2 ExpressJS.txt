@@ -127,4 +127,62 @@ app.get('/', function (req, res) {
 })
 --------------------------------------------------------------------------------------
 
-var를 const로 바꿔서 작성.
+var를 const로 바꿔서 작성. 왜냐하면 우리는 최신 버전의 nodeJS를 사용하고있기 때문.
+
+const express = require('express') 이코드를 보자. 
+
+기본적으로 require가 하는일은 node module을 어딘가에서 가져오는 것이다.
+
+이경우에는 express라는 이름의 폴더를 내 파일들속에서 찾으려고 할 것이다.
+
+만약 못 찾으면 그다음엔 node_module 안에서 찾으려고 한다.
+
+node_module안에 express폴더가 있고 그안에 index.js가또 있다. 그안에는 여러 routes ,routers, application, request 코드들이 많다.
+
+이런 것들이 nodeJS의 파워이고 모든게 작은  블럭단위로 구성되어 있다. 
+
+설치한 다음에 require하거나 import하면 된다.
+
+----------------------------------------------------------------------------------------
+
+다시돌아와서
+
+const express = require('express')
+const app = express()
+
+
+************************ 이부분은 나중에 다룬다 *****************
+app.get('/', function (req, res) {       
+  res.send('hello world')
+})
+*********************************************************************
+expree를 불러온다음. 
+
+const app으로 변수선언하고 express를 실행해서 담은것이다.
+
+다음과 같은 코드 작성
+->app.listen(4000) 
+
+app에게 4000번포트를 들으라고 명령하는 것이다.
+작성후 실행해본다. 실행은 node index.js를 터미널에 입력.
+
+localhost:4000으로 접속하면 cannot GET / 라고 뜨는데 이경우에는 연결은 됐지만, 서버로부터 에러를 받은것이다.
+
+root(/)에 아무것도 표시할게 없다는 뜻이다. 서버에 홈페이지로 보여줄게 없다는거지 최소한 서버는 있다는 것이다.
+
+"scripts": { "start": "node index.js" }를 package.json에 넣어주면 npm start로 서버를 실행시킬 수 있다. ( 이런방식이 더 우아하다 )
+
+이제 위와 같은 방법을 콜백형식으로 바꿔보려한다.
+
+좀더 이쁘게 보이기위해 포트번호를 변수에 담아준다. ex) const PORT = 4000;
+
+그리고 app.listen(PORT, handleListening); 으로 콜백처리한다.
+
+function handleListening() {
+  console.log(`Listening on: http://localhost:${PORT}`);
+} 
+-> 함수선언. 
+
+서버의 실행은 npm start로. 이것이 express.js로 첫 서버를 갖게 된것이다. 
+
+
