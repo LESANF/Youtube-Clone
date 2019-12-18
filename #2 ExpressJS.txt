@@ -263,3 +263,105 @@ send하는 대신 완전한 html, css파일을 send해줘야 한다. <- 이내�
 위와 같은 코드가 기본적으로 하는 기본 작동 방식이다.
 
 서버를 생성하고, route(app.get)을 생성하고 그것에 응답(function)하는 방식이다
+
+
+================================================================
+
+< #2.5 ES6 on NodeJS using Babel >
+
+Babel이란 무엇일까 ?
+-> 최신의 Javascript코드를 아주 무난한 예전의 Javascript코드로 변환해주는것.
+
+설치법은 터미널에서 npm install @babel/node
+
+그리고 Babel은 많은 stage를 가지고 있는데, stage-3정도면 절반정도가 브라우저에 받아들여지고
+
+stage0은 완전 실험적인 걸 얻게 될것이다. 사용할 수 있는 많은 preset이있는데
+
+우리가 사용할것은 -env이고 가장 최신이긴 한데 실험적인 수준까지는 아닌것.
+-> ( 쓰고 싶은대로 JS코드를 써도 되는데, 그렇다고 실험적인 수준까진 아닌것. )
+
+npm install @babel/preset-env로 -env설치.
+
+만약에, 리엑트를 한다면 다른 종류의 Preset이 있는데, 왜냐하면 Babel도 우선 리엑트가
+
+어떻게 작동하는지 알아야 하니까.
+
+우리의 경우 Babel-env를 사용할건데, 나머지 할일은 파일을 하나 생성하고 .babelrc라고 한다.
+
+{
+  "presets": ["@babel/preset-stage-0"] ( 우리는 env를사용하기 때문에 preset-env"로 끝내야한다 stage-0은 예시)
+}
+
+이것을 .babelrc 파일에 우리가 다 집어넣을것이다. 우리가 원하는 모든 설정을 node.js와 JS와 관련된 필요한 것들을.
+
+이파일의 의미는 Babel, 넌 이런 preset을 가질거야 또는 다른 preset을 가질거야 라고 
+
+여기가 Babel을 설정하는 곳이다. Babel이 실행되기 전에 이 파일을 찾아보고 여기 설정해둔 preset을 읽고 이해하게 될것이다.
+
+.babelrc 파일 생성 후 아래의 코드 삽입.
+-> { "presets": ["@babel/preset-env"] }
+
+작동하는지 테스트해보려면.
+
+const express = require("express"); 를 최신의 JS버전으로 바꿔본다.
+-> import express from "express";  같은내용이지만 훨씬 보기좋다.
+
+※ 최신의 코드를 무난하게 바꿔주는데 왜 여기서는 최신의 버전으로 바꿔주는건가 ?
+-> express에서 import express를 작성하려면 Babel이 필요하기때문.
+Babel을 사용하지않고 앞선 const express로 코드를 짜도 작동함.
+
+이제 node가 내 index.js를 실행하는 대신 babel이 실행해주길 바란다.
+
+어떻게 될거냐면, Babel이 코드를 변환할것이다. 못생긴 코드로. 그런다음 node.js로 실행해주는 것이다.
+
+bable-node index.js 으로 코드를 수정하고 npm start(서버실행) 하면 에러가 뜰것이다
+
+에러를 읽어보면 뭐때문에 에러가 뜬지 알 수 있다. 강의와같이 core가 없으므로
+
+콘솔창에 npm install @babel/core로 설치해주자. 설치한다음 npm start(서버실행)
+
+import express로도 서버가 정상적으로 돌아가는것을 확인한다
+
+========================================================
+
+< Arrow Function >
+
+또 하나더 ES6의 새로운 기능인 const 변수 선언이다.
+
+아래와 같은 기존 함수를 arrowFunction으로 고쳐 쓸 수 있다.
+
+function handleHome(req, res){ res.send("Hi!"); }  를 고쳐쓰면
+
+const handleHome = (req, res) => res.send("Hi!"); 로 고쳐쓸 수 있다.
+
+매개변수가 없어도 const blabla = () => 코드내용; 으로 사용 가능.
+
+< nodemon >
+
+서버를 끄고 키고를 반복하며 웹사이트를 새로고침하여 내용을 확인하는것은 좋은방법이 아니다.
+
+nodemon을 설치하기전 dependency와 별개로 package를 설치하는 방법을 알아야한다.
+
+dependencies는 bable/core, node, preset-env, express등 과같이
+
+내 프로젝트가  실행되려면 필요한 것을 말하는것이고
+
+만약 내가 프로젝트의 실행과 관련없는 걸 설치하고 싶으면, 개발자에게 도움이 될 말한, 좀 더 편하게 해줄만한
+
+우리가 그런 걸 설치하려고 하는것이다.
+
+우리는 이걸 dependency에 포함하려는게 아니라.(프로젝트가 실행될때 필요한게아니라 프로그래머에게 필요한 거니깐)
+
+콘솔창에 npm install nodemon -D를 입력하여 설치하면 새로운 entrypoint로 devDependency라는게 생겼다.
+
+이건 내가 필요한것이고 프로젝트가 필요한게 아니라 개발자가 필요한것이다. 설치를 완료하면
+
+scripts에 start 부분에 nodemon --exec bable-node index.js로 수정한다. ( --exec : excute )
+
+npm start(서버실행) 하면 노란색 글자로 로그가 뜰것이고. 이것은 내가 코드를 저장할 때마다
+
+알아서 서버를 재시작한다. 우리가 매번 껏다가 다시키고 새로고침하고하는 번거로움을 막아준다.
+
+
+
