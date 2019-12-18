@@ -185,4 +185,81 @@ function handleListening() {
 
 서버의 실행은 npm start로. 이것이 express.js로 첫 서버를 갖게 된것이다. 
 
+====================================================
 
+< GET, POST >
+
+니가 웹사이트에 가면 url을 적을텐데 이때 브라우저가 GET method를 실행하고
+
+기본적으로 그렇게 브라우저가 페이지를 읽어온다. 
+
+웹사이트에 로그인하면 POST를 통해 하게 된다. 
+
+브라우저가 웹싸이트에 정보를 전달하는것이다. ( POST라고 불리는 method를 통해서 )
+
+이것이 http의 작동 방식이다. GET request로는 정보를 전달할 수가 없다. 
+
+POST request로는 정보를 전달할 수 있다. 
+
+어떤 사람이 main URL로 접근(GET) 할 때, 서버가 응답하게 해보자.
+
+app은 앞으로 많은것을 하게 될건데, 지금 할 건 get이다.
+
+app.get("/", handleHome);   <- 누군가 이 URL(main URL)로 접근하면 handleHome함수가 호출될것이고.
+
+function handleHome() {
+  console.log("Hi from Home!!");
+}
+
+여기까지 하고 서버를 다시 시작하면 무한 로딩에 걸린다.
+
+VSC 터미널의 콘솔을보면 Hi from Home!!라고 출력됐다.
+
+문제는 GET request에 있다. 그에 대한 응답이 있어야 한다. 그래서 뭔가 응답을 하게 만들어야한다.
+
+내가 만든 서버로 응답하거나, 에러, OK, HTTP메시지 라던가, 뭐가 됐던 응답을 해야한다.
+
+일반적으로 서버가 하는 것 ( Express 홈페이지를 예로들어서 새로고침을 하면 서버가 하는일은 HTML로 응답하는것이다 )
+
+나도 뭔가를 응답해야 하고, 이것은 express가 늘 하는 일이다. 
+
+어떻게 작동하냐면 handleHome같은 함수들이 2가지를 호출한다. 하나는 request object 다른하나는 reponse object
+
+예를들어 우리가 정보를 얻고자 하면, 누가 페이지를 요청했는지나, 어떤 종류의 데이터가 페이지로 전송됐는지
+
+그럴 때 request object를 사용한다. 예를 들어 아이디와 패스워드를 전송한다면 ("/") 이 URL에 POST 방식으로 ex) app.post("/")
+
+아이디랑 패스워드를 보낸다면, 서버에는 request object로 그 정보를 얻을 수 있다.
+
+response object를 실행을 해볼건데, 다음과같이 코드를짠다.
+
+function handleHome(req, res) {
+  res.send("hi !");
+}
+
+res.send("hi !");는 뭔가를 응답한것이다. 여기서 requset는 사용하지않았지만, 
+
+res.send를 사용했을때 어떻게 작동하는지 알아본것이다.
+
+
+app.get("/profile", handleProfile);
+
+function handleProfile(req, res) {
+  res.send("this is profile");
+}
+
+다음과 같이 코드를 추가하고 서버를 다시시작한다.
+
+localhost:4000/profile 로 이동할경우 handleProfile함수가 호출되고 
+
+그함수는 res.send를 이용하여 this is profile이라고 응답한다. 
+
+이런것이 서버처럼 잘 응답한다고 보여진다.
+
+이서버가 웹싸이트 서버처럼 작동되기 위해서 우리가 해야 할 것은 
+
+send하는 대신 완전한 html, css파일을 send해줘야 한다. <- 이내용을 이번파트에서 배울것이고
+
+위와 같은 코드가 기본적으로 하는 기본 작동 방식이다.
+
+서버를 생성하고, route(app.get)을 생성하고 그것에 응답(function)하는 방식이다

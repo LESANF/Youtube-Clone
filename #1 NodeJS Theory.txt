@@ -24,4 +24,6 @@ window = 10.13.0LTS 버전 다운로드 버전이 높은건 최신의 기능이 
 
 macOS = 구글에 brew install node검색
 
-버전보는법 node -v
+버전보는법 node -v, npm -v
+
+터미널로 vsc켜는법 code .
