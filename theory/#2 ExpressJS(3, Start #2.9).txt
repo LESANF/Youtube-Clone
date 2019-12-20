@@ -72,4 +72,6 @@ export default globalRouter;
 
 =================#2.9 MVC Pattern part One End ==============
 
+routers폴더에 들어있는 global, user, video~~.js파일들에 뭔가 하기전에 (파일들안에 route를 적고싶지 않기 때문에)
 
+routes.js 파일을 만들려고한다. 분할정복을위해(divide and conquer) 

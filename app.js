@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
 import globarRouter from "./routers/globalRouter";
+import routes from "./routes";
 
 const app = express();
 
@@ -15,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan("dev"));
 
-app.use("/", globarRouter);
-app.use("/user", userRouter);
-app.use("/video", videoRouter);
+app.use(routes.home, globarRouter);
+app.use(routes.users, userRouter);
+app.use(routes.videos, videoRouter);
 
 export default app;
