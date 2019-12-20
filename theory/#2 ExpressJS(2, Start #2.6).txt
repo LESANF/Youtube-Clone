@@ -216,3 +216,109 @@ json도 이해하길 바라기 때문에  app.use(bodyParser.json()); 추가.  �
 
 ===========================end #2.7 ==================================
 
+새로운 파일을 만들자 ! init.js 그리고 index.js 파일명을 바꾼다 -> app.js로 
+
+app.js의 파일 내용을 복사하여 init.js에 붙여넣는다 그리고 PORT와 관련된 부분 삭제 !
+
+그리고 init.js 내용을 다시 app.js에 옮기고 init.js는 백지로 만들어 다시 코드를 써준다.
+
+우리는 지금 router에 대하여 배울것이다.
+
+그리고 백지가된 init.js에 application을 호출하고 싶다.
+
+app.js에는 app object가 있고 그것을 init.js에 줘야한다. 이것은 처음으로 ES6 Javascript 모듈을 너에게 소개하는 것이다.
+
+ES6에는 모듈이라는 게 있어서 우리 코드를 공유할 수 있다. 다른 파일에서의 코드를 가져다가 사용할 수 있어.
+
+예를들어 express, morgan, helmet 등등을 불러 썼다. 어딘가에서 불러왔다(import) 앞의 예들은 node_module에서 불러옴.
+
+우리가 할건. app.js을 init.js에서 사용하는거다. 그러기 위해선 export default app; 이라 써준다.
+
+※ es6에서 [export 변수]와 [export default]가 있는데 export는 해당변수만 export고 default 파일전체를 default다 
+
+export default app은 파일전체를 default하는 것이다.
+
+누가 내 파일을 불러올때(import) app object를 주겠다는 의미다. app objcet는 앞서 우리가 선택한 app.use, app.get등 이미 설정한 것이다.
+
+이제 init.js에서 부른다 app을 import app from"./app";
+
+왜 app이 아니라 ./app이냐면 ./은 같은 디렉토리에 있는 위치고 ../은 한단계밖에있는 위치를 의미한다. app과 init은 같은 디렉토리이므로 ./이 맞다.
+
+그 후 init.js에서 PORT변수를 만들어 4000을 담고 handleListening 함수를 만들어 서버가 작동했을때 console.log에 내용이 찍히도록 작성한다. 
+
+실행은 똑같다 app.listen(PORT, handleListening); 
+
+그냥 실행하면 깨질것이다 crashed. 왜냐 nodemon이 index.js를 실행시키기때문. init.js로 바꿔주자. -> npm start(서버실행) 정상작동.
+
+< router >
+
+express에서의 router는 앞에서 해온 app.get("/", handleHome) 과같은 것보다 조금더 복잡하다.
+
+router란 route들의 복잡함을 쪼개주는데 사용할 수 있다.
+
+예를들어 /user, /user/edit, /user/changepassword, /user/logout  이런경우 router를 쓸 수 있다.
+
+새로운 router.js라는 파일을 만들자 그리고 import express from "express";로 express를 불러와주고
+
+router를 만들다. router 명은 userRouter다. const userRouter = express.Router(); 로 router 생성.
+
+userRouter에 경로는 home("/")에다가 함수를 하나만든다. 함수는 익명의 함수를 만드는 식으로. (이렇게 하지않고 밖에 분리해서 만들어도됨 )
+-> userRouter.get("/", (req, res) => res.send("User index"));
+
+이 router들을 사용하는 방법은 ?
+-> router는 많은 route들이 담긴 파일이야. 
+
+일단 app에서 router를 쓰기위해 router.js에서 export해준다. 앞서만든 userRouter변수 앞에 export만 붙여주면 해당변수만 export할 수 있다.
+-> export const userRouter = express.Router(); userRouter를 내보내는(export)하는 것이다.
+
+그리고 app.js로와서 import한다 userRouter를. 여기서 import를 하는 방식이 조금 다른데
+
+app과같이 export default하는 경우는 import ~~ from "~~~ "; 이지만.  
+
+그냥 export한 경우는 import { userRouter } from "./router"; 로 받는다. 
+
+그리고 app에 경로를 하나더만든다. app.get("/user", userRouter); 로 이것은 /user로 접근했을때. import한 userRouter를 준것이다.
+
+여기서 살짝 바꿀것이 있는데 app.get이아닌 app.use로. use의 의미는 누군가 /user 경로에 접속하면 이 router 전체를 사용하겠다는 의미
+->app.use("/user", userRouter);
+
+서버를 키곡 /user로 이동하면 userRouter에 있는 route들을 사용할 것이고 제일처음 나타나는 것은
+
+userRouter.get("/", (req, res) => res.send("User index"));
+userRouter.get("/edit", (req, res) => res.send("User edit"));
+userRouter.get("/password", (req, res) => res.send("User password"));
+
+셋중 "User index"이다. /user에 접근했을때 userRouter가 실행되고 userRouter의 index는 ("/") 이기때문에 user index가 나타난다.
+
+다른 경로들도 당연히 이동가능하다. 내가 원하는 만큼의 router를 만들 수 있다.
+
+
+
+========================= 요약 =============
+
+* ES6 모듈(파일 간 코드 공유)을 사용하여 init.js에서 application(app Express Object) 호출하기
+ - index.js -> app.js
+   - handleListning, listen() 삭제 (불필요한 부분)
+ - init.js 생성
+ - app.js : export default app; // app.js를 누군가 파일로 import 하면 app object를 주겠다. app.use, app.get 등 설정한 것 포함
+ - init.js : import app from "./app"
+ - 3분40초처럼 서버 실행 코드 작성
+ - package.json : "start": "nodemon --exec babel-node init.js --delay 2"
+
+* express router
+ - route들의 복잡함을 쪼개어 단순화
+ - router = 많은 route들이 담긴 파일
+ - router.js 생성
+   - import express from "express"
+   - export const userRouter = express.Router(); // 파일로(X) 변수로(O) export
+
+
+
+
+
+
+
+
+
+
+
