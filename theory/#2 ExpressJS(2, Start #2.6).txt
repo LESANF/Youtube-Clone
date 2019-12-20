@@ -128,3 +128,91 @@ app.get("/profile", handleProfile);
    - 모든 요청에 미들웨어 설정 방법 : app.use(); // get함수(route 처리) 이전에 먼저 설정
 
 ===========end #2.6 Express Core: Middlewares part One ================
+
+Morgan이라는 Middleware를 설치해보자, logging에 도움을주는것이다, logging은 무슨 일이 어디서 일어났는지 기록하는 것이다.
+
+설치: npm install morgan, 설치 후 import해줘야한다. import morgan from "morgan";  import다음 morgan 대신 닉네임(아무거나) 사용가능
+
+기존 between middleware 삭제 app.use(morgan("인자로여러가지"));
+
+우리가 사용할건 morgan말고 helmet도 있다. 헬멧은 node.js 앱의 보안에 도움이 되는 것이다.
+
+마찬가지로 import helmet from "helmet"; 하고 app.use(helmet()); 하면 된다. 이것은 보안을 위한것이고 좋은 버릇이다.
+
+그리고 가끔은 middleware가 연결을 끊을 수 있다. 
+
+const middleWare = (req, fuckresponse, next) => {
+  fuckresponse.send("im middleware");
+};  
+
+따로 middleware를 만들고 app.get("/", middleWare, handleHome); 이 route에 추가해주면.
+
+middleware는 연결을 끊어줄수가있다 만약 res.send를 실행하는 함수를 발동하면. next함수 대신에 !
+
+< cookie parser, body parser >
+
+둘다 express의 middleware이다. cookie와 body를 다르는 걸 도와준다.
+
+기본적으로 누군가 form을 채운다면, form을 채워서 너에게 전송한다면, 이 form은 서버에 의해서 받아져야만 한다.
+
+만약 내가 이름과 비밀번호를 입력했다면, 전송하면, 서버에 의해 받아져야만 한다. 특정한 형태로.
+
+form을 받았을때. 그 데이터를 갖고 있는 req(request object)에 접근할 수 있길 원한다. 그걸 위해 내가 해야할것이 일단 
+
+body-parser의 설치이다. npm install body-parser 
+
+body로부터 정보를 얻을 수 있게 해주는것이다.
+
+그리고 cookie-parse을 설치한다. npm install cookie-parser
+
+cookie에 유저 정보를 저장할것이다. session을 다루기 위해서. 그래서 둘 다 필요한것이다.
+
+cookie parser와 body parser를 import해주자 import ~~ from ~~
+
+import하고 app.use로 middleware 사용한다.
+
+body-parser에는 우리가 정의해야할 옵션이 있다. 그 중 json이란 옵션이 있고, text, urlencoded등 모든 것들에 대해 이해해야한다.
+
+왜냐면 우리 서버가 우리가 무엇을 전송하는지 알 수 있어야 하니까. 예를 들어 json을 전송한다면, 서버가 json을 이해하길 바래야겠지.
+
+우리가 일반적인 html form을 전송한다면, 서버가 urlencoded라는 걸 이애하길 바래야된다. 이런 방법이 기본적이고 이게 우리 서버를 설정하는 내용이고
+
+이게 서버가 유저로부터 받은 데이터를 이해하는 방법이다, 유저로부터 받은 cookie를 이해하는 방법이다.
+
+이와같은 것을한번해본다.
+-> app.use(bodyParser.unlencoded({extended : true});  그리고 우리 서버가 이해하길 바라는데 form에서 받은 데이터 뿐만아니라
+
+json도 이해하길 바라기 때문에  app.use(bodyParser.json()); 추가.  기억해라 코드는 위에서부터 아래로 작동함. top to bottom
+
+====================요약====================
+
+* Morgan(middleware) : logging(무슨 일이 어디서 일어났는지 기록)
+ - npm install morgan
+ - import morgan from "morgan";
+ - app.use(morgan());
+ - 인자로 로깅 옵션 설정 가능
+   - "tiny", "combined", "common", "dev"
+
+* helmet(middleware) : node.js 앱 보안에 도움
+ - npm install helmet
+ - import helmet from "helmet"
+ - app.use(helmet());
+
+* middleware로 연결(connection) 끊기
+ - 미들웨어가 res.send 호출하면 거기서 연결 끝
+
+* cookie parser(middleware) : session을 다루기 위해 cookie에 사용자 정보 저장
+ - npm install cookie-parser
+ - import cookieParser from "cookie-parser";
+ - app.user(cookiePaerser());
+
+* body parser(middleware) : form 데이터 가진 request object에 접근
+ - npm install body-parser
+ - import bodyParser from "body-parser";
+ - app.use(bodyParser());
+ - 옵션
+   - json : bodyParser.json();
+   - html : bodyParser.urlencoded({extended:true});
+
+===========================end #2.7 ==================================
+
