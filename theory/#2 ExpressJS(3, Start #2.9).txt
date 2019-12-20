@@ -1,0 +1,75 @@
+MVC Pattern part One
+
+MVC = Model, View, Controller
+
+M = data ( 데이터 )
+V = how does the data look ( 데이터가 어떻게 생겼는지 )
+C = function that looks for the data ( 데이터를 보여주는 함수 )
+
+이건 패턴(pattern)같은 것이고, 일종의 끝내주는 구조(structure)같은 것.
+
+router.js 있는 코드를 URL과 Function을 분리 할 것이다. 데이터의 모습에 맞춰서.
+
+우리는 한 가지에대한 router를 가질거니까, router.js -> userRouter.js (파일명 변경)
+
+그리고 videoRouter.js를 생성하여 2개의 Router파일을 routers 폴더에넣어줌.
+
+userRouter들의 route들을 지우고 videoRouter에 다음과같은 코드를 삽입
+
+import express from "express";
+
+export const videoRouter = express.Router();
+
+export default videoRouter;
+
+그리고 userRouter에도 export default userRouter; 작성
+
+app.js에서 한가지 변수만 import하는 {userRouter} 를 지우고 새로운 라우터 2개를 import
+
+import 했으니 app.use로 사용한다
+
+app.use("/user", userRouter);
+app.use("/video", videoRouter);
+
+이와같은 경우는 /user/ID, /user/me, /user/login, /user/join 이런식으로 쓰일 수 있다.
+
+user와 video를가지고 이것뿐만 아니라 글로벌 router를 가질것이다 예를들어 /join, /login ,/home
+
+왜냐하면 여기 home URL은 없기 때문, home URL은 wetube/user가 아닌 wetube이 되어야한다.
+
+즉, 누군가 이 URL("/")을 다뤄야함. 누군가 root("/") 로 접속하면 globalRouter를 찾는다.
+
+글로벌라우터에선 /join, /search등 검색, 홈 이런것들을 다룬다.
+
+import express from "express";
+
+export const globalRouter = express.Router();
+
+export default globalRouter;
+
+↑↑↑↑위와같은 코드처럼 작성하는 방법이 유일하게 독점적으로 URL을 다루는 방법이다.
+
+======================요약==============================
+
+*MVC 패턴
+ - Model(데이터, DB), View(데이터의 생김새, template) Controller(데이터를 찾는 함수)의 약자
+ - 패턴 : 구조
+ - 방법
+   1. 데이터 모습에 맞게 URL(router)과 함수(Controller) 분리
+     - app.js의 get 호출, handler 삭제
+     - router.js -> userRouter.js 이름 변경
+     - videoRouter.js 생성
+     - routers 폴더 생성, router들 넣기
+     - userRouter.js : get 호출 삭제
+     - userRouter.js, videoRouter.js : 파일로 export(export default ~)
+     - app.js
+       - import userRouter & videoRouter
+       - app.use("/user", userRouter); app.use("/video", videoRouter);
+     - globalRouter.js 생성
+       - export default globalRouter 하도록 코드 작성
+       - app.js
+         - app.use("/", globalRouter) 하도록 import하고 코드 작성
+
+=================#2.9 MVC Pattern part One End ==============
+
+
