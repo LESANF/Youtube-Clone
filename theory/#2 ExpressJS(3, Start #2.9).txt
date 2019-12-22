@@ -24,7 +24,7 @@ export default videoRouter;
 
 그리고 userRouter에도 export default userRouter; 작성
 
-app.js에서 한가지 변수만 import하는 {userRouter} 를 지우고 새로운 라우터 2개를 import
+app.js에서 한가지 변수만 import하는 {userRouter} 를 지우고 새로운 라우터 2개를 import한다
 
 import 했으니 app.use로 사용한다
 
@@ -72,6 +72,82 @@ export default globalRouter;
 
 =================#2.9 MVC Pattern part One End ==============
 
+
+/* get은 "/"와 같은 경로를 처리하기 위해 GET엔드 포인트를 정의하는것입니다. 
+   use는 사용한다 미들웨어를 모든 루트에서 모든 요청안에서*/
+
 routers폴더에 들어있는 global, user, video~~.js파일들에 뭔가 하기전에 (파일들안에 route를 적고싶지 않기 때문에)
 
-routes.js 파일을 만들려고한다. 분할정복을위해(divide and conquer) 
+routes.js 파일을 만들려고한다. 분할정복을위해(divide and conquer), route들을 다 한군데모아서 export해서 쓰기위해 따로만드는방법.
+
+모든 route들을 routes.js에 작성하고, 다시한번더 객체화시켜서 export default처리 시킨다 (routes.js를 밖에서 쓰기위해.)
+
+const EDIT_VIDEO = "/:id/edit"; 와같이 :id의 쓰임세는 videos/1/edit 이런식으로 쓰인다. id는 1,2,3... 동적이다.
+
+:id를 정의하자면 express가 너무 똑똑해서, :id 이값은 변하는 값이구나를 알아차린다. 
+
+:id가 아닌 그냥 id면 이를 텍스트로 인식한다
+
+app.js에서 사용하기위해 import routes from "./routes";를 함. 그리고 아래코드와 같이 사용
+
+app.use(routes.home, globalRouter);
+app.use(routes.users, userRouter);
+app.use(routes.videos, videoRouter);
+
+앞 = 경로, 뒤 = 경로에 접근했을때. 실행되는것.
+
+※routes.users = /users이고 /users로 접근했을때 userRouter로 접근한다 안에는 여러개의 get route들이 있는데
+userRouter의 index는 users이다 users는 즉 /users이기 때문에. 전체적인 경로를 보자면 = locahost:4000/users/users가 되는것이다.
+
+각각의 라우터들 (globalRouter.js, userRouter.js, videoRouter.js)에서 routes.js를 사용하려면 import해서 사용하면된다 
+
+위와같은 3개의 라우터들은 routers라는 폴더에 들어가있으므로, import경로를 잡을때는 ../를써서 나와야한다 
+
+./ = 현재 디렉토리, ../ = 한번나간상태의 디렉토리 routes를 찾으려면 routers 폴더를 나와야되기 때문에 ../로 경로지정
+
+각라우터들에게 globalRouter.get, userRouter.get, videoRouter.get으로 res.send해서 응답처리까지한다.
+
+
+★★★★★ ↓↓↓↓↓↓↓ ★★★★★
+
+1. 모든 route들을 rotues.js에 const로 선언. ex) const EDIT_PROFILE = "/edit-profile";
+
+2. 그리고 선언한 모든 route들을 const routes = {home: HOME, ~~~~ }로 객체 선언
+
+3. export default routes로 다른 곳에서 routes.js에 관한 코드를 쓸수있게 export(수출)! 시킴.
+-----------------------------------------------------------------------------------------------------
+app.use(routes.home, globalRouter);
+app.use(routes.users, userRouter);
+app.use(routes.videos, videoRouter);
+
+다음과같이 app.js에서 선언하고 각각 home, users, videos에 접근했을때 
+
+각각 라우터들이 실행된다. 
+
+실행될때 맨위에있는게 각 라우터들의 index경로이고, 라우터로 넘어가기전에 
+
+routes.home, users, videos의 경로를 localhost:4000/blalbalba로 가지고 넘어간다.
+
+home의 경우 "/", users = /users, videos = /videos
+
+넘어가게 되면 정의된 get에 따라 res.send로 응답하여 화면에 text를 남기게됨 .
+
+======================요약==============================
+
+* 경로 변경
+ - /user -> /users
+ - /video -> /viders
+
+* URL 만들기
+ - 프로젝트 폴더에 routes.js 생성(어디서든 모든 URL을 불러 쓸 수 있게)
+   - URL 관련 상수 선언(6분21초)
+     - URL 문자열 안에 콜론 쓰면 express가 변수 처리함
+   - route 객체 생성(7분12초)
+ - app.js : import routes from "./routes.js";
+   - app.use("/", ~) 에서 / &/user & /video 대신 routes.home &  routes.users & route.video로 변경
+ - globalRouter.js
+   - import routes from "../routes";
+   - globalRouter.get(routes.home, (req, res) => res.send('Home'));
+   - join, login, logout, search도 작성(9분29초)
+
+=================#2.10 MVC Pattern part Two End ==============
