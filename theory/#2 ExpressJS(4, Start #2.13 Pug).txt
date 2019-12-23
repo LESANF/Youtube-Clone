@@ -41,3 +41,52 @@ A. videoController로 가서 home을 전송하는 대신 res.render를 사용할
 npm start를하면 hello!로 나올것이고 브라우저에서 검사를하면 <p> 태그안에들어간 hello!로 나타날것이다.
 
 controller에 있는 모든 res.send들을 res.render로 바꾸고 views폴더에 home.pug처럼 파일을 모두 만들어준다 함수에 대해.
+
+userRouter와 videoRouter에서 users, videos 경로 지우고 마찬가지로 컨트롤러에서도 지우고 
+
+나머지 파일들 모두 res.render로 바꾸고 home.pug처럼 모두 views에 pug형식으로 파일생성.
+
+---------------------------------------------------------------------- #2.13 end --------------------------------------------------
+
+HTML과 CSS만으로 작업할때는 똑같은 것을 반복하는 경우가 많기 때문에 별로 좋지 않다.
+
+HTML과 CSS는 프로그래밍 언어가 아니고, 논리적인 작업들을 할 수 없다. 계속 복사-붙여넣기 하는건 힘들다.
+
+pug 와 같은 것들로 작업을 하면, JavaScript의 위력을 사용할 수 있다 우리의 html을 만들때.
+
+views 폴더 안에 layouts라는 이름의 새폴더 생성. 폴더명은 상관없음. 
+
+layouts안에 main.pug 파일 생성. main에 HTML작성을 시작할거고 이 파일은 모든 페이지들의 토대가 되는 파일이 될거다.
+
+모든 페이지들은 header, footer, HTML head 태그, css link를 필요로 한다. 
+
+이 레이아웃(main)에 그 공통되는 코드들을 집어 넣으면 된다. 
+
+1. doctype 쓰고 html 씀.
+
+-> pug가 작동하는 방식은 HTML의 방식과 다른데, <> 방식을 사용하지않고 대신 들여쓰기를 한다. (탭을하거나 스페이스4칸 원하는거 아무거나 쓰면됨.)
+
+탭 안쪽에 있는 코드라면, 무언가의 내부에 있는 코드라는 뜻이다. 
+
+탭 바깥에 있는 코드라면, 윗줄 다음의 코드라는 뜻이지, 탭안 쪽이면 children이라는 뜻이다. 
+
+shift + tab으로 탭 바깥쪽으로 꺼내올 수 있다.
+
+Ⓒ = &copy;
+
+(2:00)분부터 시작
+
+
+==================================================
+* Pug : HTML CSS를 논리적으로 작업 가능 & <>대신 들여쓰기 사용
+ - views 폴더에 layouts 폴더 생성
+   - layout 파일 생성
+     - main.pug : 공통으로 적용될 html, head, header, footer, css link 등의 코드
+       - block : 다른 레이아웃이 들어갈 자리
+         - 레이아웃 사용 방법 : block에 들어갈 레이아웃 파일 제일 위에 extension(기본 템플릿을 확장하겠다)
+           - extends layouts/main.pug
+           - block content에 들여쓰기 해서 내용 작성
+
+
+
+
