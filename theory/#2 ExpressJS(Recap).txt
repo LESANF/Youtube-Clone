@@ -1,0 +1,50 @@
+routes에 있는 로직 관련 코드들을 모두 userController와 videoController로 옮겼다.
+
+복습을 해보자.
+
+init.js에는 app.js에서 import한 application이 있다.
+
+application 관련 코드들은 app.js 파일에 담겨 있다.
+
+app.js파일을 살펴보면, express를 import 했고 , express를 실행한 결과를 app 상수로 만듬.
+
+그리고 middleWare들을 추가함.
+
+cookieParser는 cookie를 전달받아서 사용할 수 있도록 만들어주는 미들웨어이다.
+
+사용자 인증 같은 곳에서 쿠키를 검사할 때 사용해야 하기때문.
+
+bodyParser는 사용자가 웹사이트로 전달하는 정보들을 검사하는 미들웨어이다.
+
+request 정보에서 form이나 json형태로 된 body를 검사한다. 
+
+왜냐하면 아바타의 사진이나 비디오를 업로드 할 때, 제목이나 댓글 같은 정보를 전달할때 
+
+form에 담아서 업로드 하기 때문이다.
+
+helmet 미들웨어는 application이 더 안전하도록 만들어줘 ( 보안 관련 )
+
+morgan 미들웨어는 application에서 발생하는 모든 일들을 logging 하는 것.
+
+그리고 우리는 3개의 router를 사용함.
+
+app.use(routes.home, globalRouter);
+app.use(routes.users, userRouter);
+app.use(routes.videos, videoRouter);
+
+그중 하나는 globalRouter인데, 이안에는 /home, /search, /join, /login, /logout URL이 들어있다.
+
+주소들은 모두 routes.js에 정의해뒀다. 한 파일이 바뀌면 모두 적용되도록 할 수 있음.
+
+모든 router의 로직들은 모두 userController나 videoController에 정의되어 있다.
+
+controller안에는 모두 함수들이고 그들은 join, Login, Logout, User Detail같은 것들을 리턴하고 있다.
+
+컨트롤러에 담은 함수들을 MVC부분중 C ( controller) 라고 한다.
+
+다음 강의부턴 Pug라는걸 설치할것이고 Pug는 express에서 View를 다루는 방식중 하나이다.
+
+express로 HTML을 보여줄 수 있다. res.send대신에, 실제 HTML을 전달할것이다. CSS같은 것들로 꾸밀 수 있고 
+
+그것이 MVC에서 V부분이다. PUG는 HTML을 멋있게 보여준다.
+
