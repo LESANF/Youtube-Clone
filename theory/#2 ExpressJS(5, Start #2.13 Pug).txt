@@ -1,0 +1,142 @@
+Pug는 view engine이다.
+
+설치 - npm install pug
+
+우리가 설정할 부분은 app.set부분이다.  
+
+set은 app.set(name, value) 보는것과 같이 name과 value가 필요하다.
+
+application의 설정을 하는 함수다. 설정할 수 있는 몇몇 값들이 있다.
+
+우리는 view engine 설정을 바꿀것이고, view engine 설정의 기본값은 undefined다.
+
+view engine 설정값을 pug로 바꿀것이다. app.set("view engine", "pug"); view engine의 이름을 pug라고 입력.
+
+pug와 express에는 view 파일들의 위치에 관한 기본 설정이 있다. 만약 그 설정을 바꾸고 싶다면 'views' 설정을 바꾸면된다.
+
+application의 화면이 담긴 디렉토리나 디렉토리의 배열을 입력하면된다.
+
+html 파일을 저장해야하는 폴더의 기본값은 [ 프로젝트의 작업 디렉토리 + '/views' ]이다.
+
+views폴더를 하나 만들고 그안에 파일을 하나 더만든다. 파일명은 home 확장자는 html대신 pug.  home.pug
+
+home.pug안에서 코드를 작성해보자
+
+hello! 라고 쓰고싶으면, p hello! 라고 작성한다. 이렇게 적어줘야 작동하는 pug코드이다.
+
+pug는 템플릿 언어야. express의 view engine이지.
+
+pug는 html파일들이 더 아름답게 보이도록 만들어줘.
+
+html파일에선 <p>hello!</p>지만 pug 파일에서는 p hello! 라고 적으면 됨.
+
+pug는 일반적인 html코드를 변환해준다. 이것이 템플릿이다.
+
+Q. 그럼, 이제 이 템플릿을 웹사이트에서 보여주려면 어떻게 해야 할까 ? 컨트롤러에서 res.send로 home을 전송하는 것 대신에 말이야.
+A. videoController로 가서 home을 전송하는 대신 res.render를 사용할거다. render 함수의 인자로 템플릿 파일의 이름을 입력하면 돼. 소문자로.
+-> res.render("home");
+
+이 함수가 views폴더에서 파일명이 home이고 확장자가 pug인 템플릿 파일을 찾은 후에 보여줄것이다.
+
+npm start를하면 hello!로 나올것이고 브라우저에서 검사를하면 <p> 태그안에들어간 hello!로 나타날것이다.
+
+controller에 있는 모든 res.send들을 res.render로 바꾸고 views폴더에 home.pug처럼 파일을 모두 만들어준다 함수에 대해.
+
+userRouter와 videoRouter에서 users, videos 경로 지우고 마찬가지로 컨트롤러에서도 지우고 
+
+나머지 파일들 모두 res.render로 바꾸고 home.pug처럼 모두 views에 pug형식으로 파일생성.
+
+---------------------------------------------------------------------- #2.13 end --------------------------------------------------
+
+HTML과 CSS만으로 작업할때는 똑같은 것을 반복하는 경우가 많기 때문에 별로 좋지 않다.
+
+HTML과 CSS는 프로그래밍 언어가 아니고, 논리적인 작업들을 할 수 없다. 계속 복사-붙여넣기 하는건 힘들다.
+
+pug 와 같은 것들로 작업을 하면, JavaScript의 위력을 사용할 수 있다 우리의 html을 만들때.
+
+views 폴더 안에 layouts라는 이름의 새폴더 생성. 폴더명은 상관없음. 
+
+layouts안에 main.pug 파일 생성. main에 HTML작성을 시작할거고 이 파일은 모든 페이지들의 토대가 되는 파일이 될거다.
+
+모든 페이지들은 header, footer, HTML head 태그, css link를 필요로 한다. 
+
+이 레이아웃(main)에 그 공통되는 코드들을 집어 넣으면 된다. 
+
+1. doctype 쓰고 html 씀.
+
+-> pug가 작동하는 방식은 HTML의 방식과 다른데, <> 방식을 사용하지않고 대신 들여쓰기를 한다. (탭을하거나 스페이스4칸 원하는거 아무거나 쓰면됨.)
+
+탭 안쪽에 있는 코드라면, 무언가의 내부에 있는 코드라는 뜻이다. 
+
+탭 바깥에 있는 코드라면, 윗줄 다음의 코드라는 뜻이지, 탭안 쪽이면 children이라는 뜻이다. 
+
+shift + tab으로 탭 바깥쪽으로 꺼내올 수 있다.
+
+-------↓ 작성된 아래의 코드 ----------( main의 layout코드 )
+
+doctype html
+html
+    head
+        title Youtube-Clone
+    body
+        main
+            block content
+        footer
+            span &copy; Youtube
+
+-------------------------------------------
+
+Ⓒ = &copy;
+
+우리가 기본적으로 head를 열었으면 닫아야하는데 여기선 닫는개념은 들여쓴 칸(탭을 한 번 누르거나, 스페이스 4칸을 누른것)을 다시 되돌아오면 닫힌다
+
+레이아웃 파일에는 실제 내용들이 들어갈 자리가 있어야한다.
+
+main 태그에 다른 모든 페이지들의 내용이 들어갈거다.
+
+그 작업을 위해 block을 추가한다. block에는 name이 있고 여기선 content라고 이름을 붙인다.
+
+이 작은 block에 화면의 내용들이 채워질것이다.
+
+만약 header에 변화를 주고싶으면 모든 템플릿에 적용이 될것이다.
+
+어떤때는 템플릿이 수백개 존재하는 경우도 있다. 그런 경우 footer를 바꾸고 싶다면 모든 파일을 다바꿔야겠지.
+
+그렇게 작업하고 싶지 않아서 레이아웃을 만드는것이다.
+
+이제 만들어진 main의 layout을 사용하는 방법을 알아보자.
+-> home 파일로가서 p태그 이전에, 파일의 제일 윗부분에 extension(확장)을 하자.
+
+이 레이아웃을 템플릿에서 확장하겠다는 뜻이다. 이 코드들도 사용하고, 거기에 추가적인 것을 더하겠다는 뜻이지.
+-> extends layouts/main.pug
+
+이제 main 레이아웃을 확장해서 사용하고 있다. (home화면이 레이아웃 코드를 복사-붙여넣기 한다는 뜻이다)
+
+확장이되면, block content태그 안에 p태그를 넣는다 (home.pug 안에)
+block content
+    p hello! i'm home
+
+
+요약하자면 main템플릿(레이아웃템플릿)을 만들었고 내용을 들어갈 곳을 만들었다 (block content)
+
+그리고 그 템플릿을 사용하기위해 레이아웃파일을 extends했다. (extends layouts/main) 즉 레이아웃 전체 코드를 복사했다는 뜻이다.
+
+전체를 복사했기 때문에, 그 위에 덮어쓰기(overwrite)할 수 있다.
+
+브라우저를 새로고침했을때 logger를 보면 304와 200으로 나뉜다 304는 수정한게 없이 그냥 새로고침했을때, 200은 무언가를 수정하고 새로고침했을때.
+
+만약에 footer가 없는 화면이라면, 이 레이아웃을 extends하면 안된다. 하지만 이프로젝트의 모든 화면에는 footer가 있고 header도 있다 그러니 상관없다.
+
+==================================================
+* Pug : HTML CSS를 논리적으로 작업 가능 & <>대신 들여쓰기 사용
+ - views 폴더에 layouts 폴더 생성
+   - layout 파일 생성
+     - main.pug : 공통으로 적용될 html, head, header, footer, css link 등의 코드
+       - block : 다른 레이아웃이 들어갈 자리
+         - 레이아웃 사용 방법 : block에 들어갈 레이아웃 파일 제일 위에 extension(기본 템플릿을 확장하겠다)
+           - extends layouts/main.pug
+           - block content에 들여쓰기 해서 내용 작성
+================#2.14 end======================
+
+
+
