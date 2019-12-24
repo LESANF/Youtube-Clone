@@ -138,5 +138,10 @@ block content
            - block content에 들여쓰기 해서 내용 작성
 ================#2.14 end======================
 
+< partials (부분적인) >
 
+partials는 페이지의 일부분이다. 조직적인 목적으로만 만들어진다.
 
+views안에 partials 폴더생성 후 footer.pug와 header.pug 생성
+
+footer 파일에는 footer태그를 추가하고 이안에는 아이콘이 들어갈거다 (폰트어썸사용)
