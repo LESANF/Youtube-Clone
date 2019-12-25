@@ -158,10 +158,43 @@ pug에서는 div태그에 클래스를 줄꺼면 div.div가아니라 .div만 주
 내용은 Youtube 2019 &copy; 
 -> Youtube는 텍스트 &copy는 카피특수문자, 2019는 자동으로 바뀌게 Data에 객체를 받아온다
 js를 쓰고싶다면 #{}사이에 넣으면된다. new Date().getFullYear() <- 년도 받아오는 객체
-
+----------------------
+#{} is the pug way
+${} is the ES6 way
+----------------------
 그리고 footer를 main layout에 붙인다. 그리고 main의 footer에 include추가하고 footer.pug의 위치를 적어줌.
 -> include ../partials/footer
 
 main의 기준에서 ../ (현재디렉토리 layouts나옴) -> 나오면 views에있는상태고 partials로 폴더들어감 거기엔 footer와 header.pug가있음.
 
+이것이 컴포넌트(모듈을 조립하는기술)를 분리하는 방식이고 웹사이트의 분리하고 싶은 부분을 분리하는 방법이다.
 
+이게 더 조직적인 방식이다. FOOTER와 HEADER는 각각 한 곳에만 있어서 더 조직화 되었고, 이렇게 여기에(main) 다 모아두는 게 더 괜찮아 보인다.
+
+** 프로그래밍은 분할 정복이다( 디바이드 앤 컨커 ) **
+
+footer와 마찬가지로 header도 만듬 
+
+header를 만들고 클래스는 header로 주고 
+
+2개의 div를만듬 div는 생략가능하니 .header__column 클래스만 적음 2개
+
+첫번째 div에는 유튭아이콘, 다음 column에는 ul li를 만들고 li에는 a(href="#")
+
+li에는 Logged out header를 추가한다. 만약 로그아웃된 상태라면 Join과 Login이 보일것이고,
+
+로그인 된 상태라면, logout, Upload Video, Profile이 헤더에 보여야한다.
+
+우리가 추가한 라우트들이 여기(pug 파일)로 연결되면 좋겠다. 만들어둔 routes.js에 접근이 되게하면 좋을것이다.
+
+a(href="#")에 a(href="/join")처럼 적기 않기 위해서. 한 곳에서만 정보를 보관하는 방법이 더 나은 코드를 만들어주는 원칙이다.
+
+많은 곳에 영향을 주는 하나를 바꾼다면, 그 하나만 바꿔주면 많은 것들이 바뀌기 때문.
+
+여기까지 했으면 모든 템플릿에 header와 footer가 있는상태 ! 
+
+main.pug의 main안에 block 적지 않으면, 어떠한 템플릿도 작동하지 않는다. (main.pug를 모든 템플릿에 뿌리고있기때문.)
+
+layout에 block을 추가해야, 페이지의 내용들이 채워진다.
+
+============================= #2.15 Partials End ===================
