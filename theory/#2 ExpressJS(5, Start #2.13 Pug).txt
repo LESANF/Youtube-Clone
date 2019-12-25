@@ -145,3 +145,23 @@ partials는 페이지의 일부분이다. 조직적인 목적으로만 만들어
 views안에 partials 폴더생성 후 footer.pug와 header.pug 생성
 
 footer 파일에는 footer태그를 추가하고 이안에는 아이콘이 들어갈거다 (폰트어썸사용)
+
+태그에 클래스를 추가할때는 바로 붙여서 footer.footer로 클래스명을 줄 수 있고
+
+pug에서는 div태그에 클래스를 줄꺼면 div.div가아니라 .div만 주고 앞에 div를 생략해도 된다.
+
+<i class="fab fa-youtube"></i> 폰트어썸 아이콘이다 이렇게해도 인식되지만 pug로 바꾸면
+-> i.fab.fa-youtube로 바꿀 수 있다.
+
+다음 span을 추가하고 클래스명은 .footer__text다 => span.footer__text
+
+내용은 Youtube 2019 &copy; 
+-> Youtube는 텍스트 &copy는 카피특수문자, 2019는 자동으로 바뀌게 Data에 객체를 받아온다
+js를 쓰고싶다면 #{}사이에 넣으면된다. new Date().getFullYear() <- 년도 받아오는 객체
+
+그리고 footer를 main layout에 붙인다. 그리고 main의 footer에 include추가하고 footer.pug의 위치를 적어줌.
+-> include ../partials/footer
+
+main의 기준에서 ../ (현재디렉토리 layouts나옴) -> 나오면 views에있는상태고 partials로 폴더들어감 거기엔 footer와 header.pug가있음.
+
+
