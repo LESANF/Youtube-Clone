@@ -198,3 +198,76 @@ main.pug의 main안에 block 적지 않으면, 어떠한 템플릿도 작동하�
 layout에 block을 추가해야, 페이지의 내용들이 채워진다.
 
 ============================= #2.15 Partials End ===================
+
+지금부터 할것은.
+
+템플릿에 정보를 추가하는 방법. 컨트롤러에 있는 정보를 템플릿에 추가하는 법.
+
+한 템플릿에만 추가하거나, 전체 템플릿에 추가할 수 있다.
+
+( 템플릿 전체에 추가하는 방법 )
+
+헤더가 라우트 객체(routes.js)에 접근하도록 하고 싶다.
+-> 미들웨어를 사용해야함. 
+
+미들웨어는 레이어(시스템을 이루는 층) 같은것이고. 위에서 밑으로 한단계씩 내려간다.
+
+처음에, view engine을 pug로 설정했고. cookie를 파싱하고, body에 담긴 정보를 파싱한다.
+
+그다음에 helmet, morgan이 있고, 그 후에 컨트롤러와 라우트들이 있다.
+-> helmet을 맨위로. 수정
+
+locals 미들웨어 생성, local변수를 global 변수로 사용하도록 만들어주는 거라고 생각하면 된다
+
+local 기능을 통해 변수에 접근할 수 있다.
+
+apu.use안에 함수를하나 만들것이고 함수 인자는 req, res, next로한다.
+
+app.use((res, req, next) => {} ) 이 코드는 es6 errow function 으로 작성한것이고
+
+app.user(function(res, req, next){ })와 같다. 이방법 외에도 localsMiddleware라는 함수를 따로 만드는 방법이있다.
+
+app.use(localsMiddleware) 이런식으로. localsMiddleware라는 새파일을 따로만든다 (코드를 분리하기 위해)
+
+만들어진 파일안에 코드를 작성. 
+-> export function localMiddleware(req, res, next) {}
+
+export해야 다른데서 이코드를 사용할 수 있음. 함수 내용에 locals를 추가할 것이고, 
+
+locals가 추가되면 이제 그것들을 템플릿, 컨트롤러, 어디에서든 쓸 수 있다.
+
+그리고 app.js에서 app.use(localsMiddleware)의 위치가 중요한데, 만약 globalRouter, userRouter아래에 두게되면
+
+그 2개의 라우터들은 locals에 접근을 못한다. 그러므로 라우터들 위에 두는것이며, 어디에 위치시켜야 할지 잘 알아야한다.
+
+app.js에서 import한다 방법은 auto로 잡히게.
+
+import 되어있는 것들은 항상 알파벳 순으로되어있는게 좋다.
+
+locals는 로컬 변수 응답을 포함하는 객체입니다. 이 프로퍼티는 유용한 정보를 내보내는 데에 유용합니다.
+
+res.locas이후에 아무거나 설정하면 된다. res.locals.siteName = "Youtube" 이런식으로.
+
+이렇게 export한걸 어디에서 사용할것이냐 -> main.pug에 와서 title에 #{siteName} 이런식으로 사용한다.
+
+locals에 있는 건 템플릿에 변수명 처럼 존재함. footer 또한 #{siteName} 이런식으로 바꿀 수 있다.
+
+다시 main에 title로 와서  | #{siteName}설정. | 기준으로 나중에 text를 넣어줄거다.
+
+이제 다른 locals도 추가해보자, routes에 routes.js 객체를 추가할거다. 이파일을 임폴트하자.
+->   res.locals.routes = routes;   routes는 auto import시킨다.
+
+이제 partials/header에 가서 a안에 "#"대신에 routes를 쓸 수 있다. a(href=routes.join) 이런식으로
+
+그리고 미들웨어가 next에 req를 전달해야 한다. next()를 적어줄것.
+
+app.js를 보면 미들웨어가 커넥션과 라우트들 사이에있으니까 enxt()라고 하면됨.
+
+6분부터다시보기
+
+
+
+
+
+
+
