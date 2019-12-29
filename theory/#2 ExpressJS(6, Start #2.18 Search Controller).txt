@@ -4,4 +4,69 @@
 partials/header 파일을 조금 수정해야함. 
 -> .header__column하나더 추가 (div는 생략한거임. pug라서)
 
+안에는 form을 추가하고 action은 routes.search로, method는 get으로(url에 있는 값들을 보고 싶어서)
+
+routes.search는 routes.js파일의 routes명으로 객체화시킨 search : SEARCH 이다. 즉 SEARCH
+
+SEARCH는 routes.js에서 const SEARCH = "/search"로 선언해놨음.
+
+form안의 input 타입은 text, placeholder="blablabla", name="term"으로 설정. 
+
+input에 값을넣고 enter를 누르면 name(서버로 전달되는 이름)이 넘어감.
+
+search페이지에 표시할 정보들이 주어졌고, 이제 search페이지를 수정한다.
+
+이코드(기존에 있던 p hello) 대신에 클래스명인 search__header인 div를 추가.
+
+div안에는 h3태그와 Searching for #{searchingBy}를 적어둠. 이 변수에는 term값을 넣어줄거임.
+
+form에서 보내는 주소는 search이므로. videoController에 온다.
+
+search로 form을 보냈다면. 그 데이터를 갖고있는 req에 접근을 해야한다. 
+
+만약 input에 nico라고 값을 넘겼으면 const searchingBy = req.query.term으로(name="term")
+
+const searchingBy = req.query.term을 es6버전으로 쓰면 아래의 코드와같다.
+const {query}의 뜻은 req.query를 뜻한다.
+
+  const {
+    query: { term: searchingBy }
+  } = req;
+
+term=nico라고 값을 가지고 있을것이다. 이것이 요청받은 데이터에서 term값을 뽑은것이고
+
+요청을 받았으면 응답을 해야한다. 그것이 res.render이고 앞서 pageTitle과 같이 객체를 추가해준다.
+
+우리가 앞서 정한 변수명은 searchingBy이고. searchingBy는 searchingBy이다.
+-> 앞의 searchingBy는 객체명이고. 뒤의 searchingBy는 앞에서 정의한 term값을 가진 searchingBy이다
+
+searchingBy : searchingBy는 문법상 간결하게 searchingBy로 줄일 수 있다.
+
+---- 요약 ----
+
+header.pug에 form을 작성하고 그안에 input을 추가했고 action은 routes.search로 method는 get형식으로.
+
+/search에 접근했을땐 함수가 실행될것이고.( 컨트롤러 C )
+
+app.js에있는 app.use(routes.home, globalRouter)를 통해 (routes.home밑으로 search가 있기때문.)
+
+globalRouter로 들어오게되고 여기서 다시 routes.search로 접근했을때, search가 실행되고 이것은
+
+videoController에 있는 search다. 여기서 다시 함수가 실행 form에서 보내는 값을 요청받았고 응답(respone)해야함.
+
+일단 form으로부터 받은 term값을 찾아내고, 그것을 res.render응답을통해 객체로 넣어 응답한다.
+
+응답되는것은 "search" 템플릿과 pageTitle, searchingBy가 들어있는 객체. search.pug에 #{searchingBy}를 통해 화면에 표시된다.
+
+pageTitle도 복습하자면. main에 #{pageTitle}이 있고. 특정 템플릿마다 별도로 바뀌게해놓음. 해당 사이트를 접속하면 
+
+응답으로 pageTitle에 들어있는 값이 다다름. 
+
+컨트롤러가 query에 접근하려면, method가 get이어야한다. get method가 url에 정보를 추가하기 때문 
+
+post method면 주소에 표시되지않음. 
+
+===================== End #2.18 =======================
+
+
 
