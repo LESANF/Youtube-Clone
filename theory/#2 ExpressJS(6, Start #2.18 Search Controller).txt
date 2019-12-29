@@ -1,0 +1,7 @@
+※ https://devbox.tistory.com/entry/HTML5-a-%ED%83%9C%EA%B7%B8 
+-> form에 관한 기본개념
+
+partials/header 파일을 조금 수정해야함. 
+-> .header__column하나더 추가 (div는 생략한거임. pug라서)
+
+
