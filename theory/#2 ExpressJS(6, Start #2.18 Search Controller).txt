@@ -122,6 +122,8 @@ Join도 login과 다를게없다. 회원가입이기 때문에 이름을 적을 
 
 partials를 추가하는 방법은 include 파일의위치. -> 우리의 프로젝트경우 include partials/socialLogin.pug 이렇게 추가.
 
+===================== End #2.19 =======================
+
 
 
 
