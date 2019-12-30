@@ -68,5 +68,62 @@ post method면 주소에 표시되지않음.
 
 ===================== End #2.18 =======================
 
+시작하기 전에, 계획을 세워본다. 
+
+Vsc내의 readme를이용해 마크다운으로 작성하자. routes.js에 들어있는 경로를 통해 작성할 페이지를 정리한다
+
+Global에서 logout은 페이지가 아니다 그리고 users에서 USERS는 페이지가아님 나머지는 페이지
+
+video에서 videos와 deleteVideo는 페이지가아님.
+
+할 목록을 마크다운으로 readme에 정리해뒀고, 이제 home부터 시작해보자.
+
+< home >
+
+Block content 부분에 .videos 클래스를추가 (div는 생략된거임)
+
+H1 태그안에 video라고 적어둠. 일단은 가짜 데이터베이스로 작업할거기 때문. 
+
+실제로 비디오를 보여주기 전에 템플릿을 테스트할 수 있다. (실제 몽고db 데이터베이스에 들어가기전에)
+
+< Log In >
+
+.form__container 추가 form을 추가하고 action은 routes.login, method는 post로 get으로하면 url에 정보가 보이게됨
+
+form 안에 input들을 넣어줌 아래와 같이 코드를 작성
+
+input(type="email", placeholder="Email", name="email")
+input(type="password", placeholder="Password", name="password")
+input(type="submit", value="Log In")   
+
+나중에 소셜로그인 버튼도 추가해야됨 (페이스북, 깃헙)
+
+< Join >
+
+Join도 login과 다를게없다. 회원가입이기 때문에 이름을 적을 input, 비밀번호를 확인할 password input, value가 join now인 submit input이 필요.
+
+지금 log In을 해도 에러가 뜰것이다. POST /login에 대한 컨트롤러가 없기때문.
+
+지금은 라우터에서 get요청을 보냈을 때에 해당하는 컨트롤러만 있기 때문이다. (이와 관련해선 다음 강의영상에서 배움)
+
+이제 partial을 만들것이다. 버튼 하나는 깃헙, 다른하나는 페이스북으로 로그인 하기위해서 이런버튼은 계속 만들어 낼 수 있다.
+
+이런 소셜로그인 버튼들을 Join화면과 Login화면에 모두 띄우고 싶다. partials폴더에 socialLogin.pug 생성.
+
+.social-login div를만들고
+
+그 안에 2개의 버튼을만듬. 클래스명은 각각 .social-login--github, .social-login--Facebook
+
+버튼안에 span으로 감싸고 icon을 넣음 그리고 Continue with Github 텍스트입력, 여기서 주의할점
+
+| Continue with Github 이런식으로 | 를 추가해야함. 이렇게 안하면 에러가뜬다 맨앞 Continue를 태그로 인식하기 떄문이다.
+
+이런식으로 깃헙, 페이스북 소셜로그인 버튼 2개를 만들고. join.pug, login.pug에 form다음 추가해준다
+
+partials를 추가하는 방법은 include 파일의위치. -> 우리의 프로젝트경우 include partials/socialLogin.pug 이렇게 추가.
+
+
+
+
 
 
