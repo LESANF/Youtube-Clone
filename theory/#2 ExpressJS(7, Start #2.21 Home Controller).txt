@@ -64,3 +64,40 @@ p=item.description 이런식으로 render받은 db.js를 뽑아서 쓴다. 우�
 * each in 문법은 pug에서만 사용.
 
 =====================================#2.21 end========================================
+
+화면에 videos를 추가했고, 다른 곳들에서 사용할 HTML 코드를 만들것이다.
+
+HTML을 재활용할거야, footer를 include해서 재활용해는 것처럼, 비디오 블록 html 코드를 만들것이다.
+
+Partials = 다시 사용하는 HTML block
+Mixin = 동적 데이터와 함께 사용하는 HTML 코드.
+
+웹사이트에서 계속 반복되는 코드를 복사-붙여넣기 하지않고 재활용하는 방법을 mixin이라고 한다.
+
+views폴더 아래 mixins폴더 생성.
+
+mixin은 웹사이트에서 자주 반복되는 html 코드를 담고 있어.
+
+폴더안에 videoBlock.pug 생성, 그리고 mixin videoBlock()를 사용 
+
+mixin은 pug의 함수의 일종이다. mixin에는 인자가 하나 필요함. 인자의 이름을 video라고 하고 기본값은 {}로. 기본적으로 빈 객체이다.
+-> mixin videoBlock(video = {}), videoBlock은 mixin의 이름.
+
+mixin에 인자가 입력되면, 그 객체의 이름을 video라고 한거다.
+
+객체가 mixin에 입력되면, 그 객체의 title을 받아와서 화면에 표시하는 것이다.
+
+home.pug로 와서 mixin을 include함. ( include mixins/videoBlock.pug )
+
+기존 h1=blablaba, p=blablabala로 적지않고, mixin을 이용함. 
+
+방법은 +videoBlock({ })을 사용, {}안에 title : "blablabla"를 쓰고 결과를 확인해보면 
+
+4개의 blablabla가 home화면에 출력되어있다. videos에는 item이 4개 있으니까, item 별로 한번씩 tile로 blablabla를 보여주는거지.
+
+원리는 home.pug에 videoBlock {}안에 입력된 title : "blablabla"가 mixing/videoBlock.pug로 넘어가서
+
+video 인자로 들어가게되고 거기서 .title로 인해 뽑혀서 출력되는 것이다.
+
+3분 40초대부터 
+
