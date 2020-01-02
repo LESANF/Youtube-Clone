@@ -72,6 +72,10 @@ HTML을 재활용할거야, footer를 include해서 재활용해는 것처럼, �
 Partials = 다시 사용하는 HTML block
 Mixin = 동적 데이터와 함께 사용하는 HTML 코드.
 
+동일한 HTML 구조를 사용하지만, 다른 데이터를 사용해야할때 = mixin
+
+HTML을 재사용하지만, 데이터를 보내지 않으려면  = partials
+
 웹사이트에서 계속 반복되는 코드를 복사-붙여넣기 하지않고 재활용하는 방법을 mixin이라고 한다.
 
 views폴더 아래 mixins폴더 생성.
@@ -89,15 +93,69 @@ mixin에 인자가 입력되면, 그 객체의 이름을 video라고 한거다.
 
 home.pug로 와서 mixin을 include함. ( include mixins/videoBlock.pug )
 
-기존 h1=blablaba, p=blablabala로 적지않고, mixin을 이용함. 
+< mixin 사용법 정리  >
 
-방법은 +videoBlock({ })을 사용, {}안에 title : "blablabla"를 쓰고 결과를 확인해보면 
+1. 사용할 템플릿에 include 한다(mixin이 있는 pug를 mixin은 pug의 함수개념)
+-> ( include mixins/videoBlock.pug ) 우리의경우 home.pug에 해당 코드를 입력하여 include
 
-4개의 blablabla가 home화면에 출력되어있다. videos에는 item이 4개 있으니까, item 별로 한번씩 tile로 blablabla를 보여주는거지.
+2. each 변수명 in videos 안에 +mixin 변수명으로 객체 생성 ({})
+-> +videoBlock({})
 
-원리는 home.pug에 videoBlock {}안에 입력된 title : "blablabla"가 mixing/videoBlock.pug로 넘어가서
+*여기서 each item in videos란. 
+-> 해당프로젝트 기준으로 변수명을 item, videos는 가짜db.js에서 받아온 배열화된 객체.
 
-video 인자로 들어가게되고 거기서 .title로 인해 뽑혀서 출력되는 것이다.
+말그대로 배열을 읽기위한 루프(반복)문이다. db.js에는 내가 만들어낸 4개의 객체가 배열화 되어있고
 
-3분 40초대부터 
+해당정보를 뽑아서 사용한다고 가정할시(title을 뽑는다고할시) 순서대로 4개의 title이 뽑혀서 출력된다 (top to bottom)
+
+3. 만들어 놓은 home.pug에 +videoBlock({}) 안에 객체를 생성함.
+
+ex) { 객체명 : item.title, 객체명2 : item.description }
+
+이런식으로 객체명은 아무거나 해도되지만 each 변수명은 반드시 지켜야함. item으로 선언해놨다.
+
+테스트 하기위해 만들어놓은 fake db(db.js)에 있는 객체값을 뽑아씀. 이렇게 +videoBlock안에 객체를 선언
+
+4. home.pug에 선언된 객체들이 videoBlock.pug에 있는 mixin videoBlock(객체명 ={}) 으로 들어가고
+
+객체명은 아무거나해도됨. 초기에 빈객체로 생성되어있었지만 home.pug의 +로인해 객체인자를 받게되고
+
+pug문법으로 h4=객체명.title 으로 선언해줌 여기서 title은 home.pug에서 선언한 title : item.title의 왼쪽 객체명(title)이다.
+
+potato : item.description 으로 home.pug에 추가했으면 potato가 인자로 넘어가 videoBlock.pug에서
+
+h4=객체명.potato 이런식으로 html작성. [여기서 객체명은 mixin의 초기 빈객체로 선언한 객체명]
+
+
+※ 정리하자면 home.pug에 +videoBlock의 객체들이 videoBlock로 전달되어 mixin함수를 실행시키고 그함수는 html로 내보낸다.
+
+이제 실제로 mixin 코드를 작성해 볼것이다. 
+
+순서대로 큰비디오화면, 비디오제목, 비디오 조회수 이렇게 기본 디자인을 잡는다.
+
+videoBlock.pug 파일에 mixin videoBlock(video = {}) / mixin 함수명을 videoBlock로 주고 인자로받을 객체를 video로 설정하고 
+
+우선 빈객체로 생성. 그리고 mixin을 작성.
+
+.videoBlock
+        video.videoBlock__thumbnail(src=video.videoFile, controls=true)
+        h4.videoBlock__title=video.title
+        h6.videoBlock__views=video.views
+
+다음과같이 .videoBlock(div)안에 video태그를 작성해주고 video, h4, h6에 각각 맞는 클래스명 작성
+
+우리가 home.pug로부터 필요한것은 videoFile, title, view 3개를 받아와야함.
+
+이미 db.js로 가짜db 테스트를위해 써놨고 +videoBlock안에
+
+videoFile : item.videoFile,
+title : item.title,
+views : item.view
+
+넣어줌 선언한 객체명이 다시 mixin함수로 넘어가고 그것을 바탕으로 함수가 뿌려줄것이다 html에 이렇게 작동.
+
+나중에는 실제 db를 사용할거임 지금은 연습을위해 db.js를 직접 임의로 작성해서 테스트해봄.
+
+============================#2.22 End====================================
+
 

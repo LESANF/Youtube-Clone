@@ -3,8 +3,9 @@ export const videos = [
     id: 111111,
     title: "first Video !!!",
     description: "This is my first",
-    view: 1111,
-    videoFile: "https://archive.org/details/BigBuckBunny_124",
+    views: 1111,
+    videoFile:
+      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
     creator: {
       id: 949494111,
       name: "Lesa-one",
@@ -15,8 +16,9 @@ export const videos = [
     id: 222222,
     title: "Second Video",
     description: "This is my Second",
-    view: 2222,
-    videoFile: "https://archive.org/details/BigBuckBunny_124",
+    views: 2222,
+    videoFile:
+      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
     creator: {
       id: 949494222,
       name: "Lesa-two",
@@ -27,8 +29,9 @@ export const videos = [
     id: 333333,
     title: "Third Video",
     description: "This is my Third",
-    view: 3333,
-    videoFile: "https://archive.org/details/BigBuckBunny_124",
+    views: 3333,
+    videoFile:
+      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
     creator: {
       id: 949494333,
       name: "Lesa-three",
@@ -39,8 +42,9 @@ export const videos = [
     id: 444444,
     title: "Fouth Video",
     description: "This is my fouth",
-    view: 4444,
-    videoFile: "https://archive.org/details/BigBuckBunny_124",
+    views: 4444,
+    videoFile:
+      "https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4",
     creator: {
       id: 949494444,
       name: "Lesa-four",
