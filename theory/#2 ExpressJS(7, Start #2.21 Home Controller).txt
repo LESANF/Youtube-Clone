@@ -158,4 +158,114 @@ views : item.view
 
 ============================#2.22 End====================================
 
+search 화면을 작업할 차례, search도 home 화면과 거의 비슷함.
+
+videoController에서 home과 같이 res.render에 videos객체 넣어줌.
+
+일단은 비디오 검색 기능을 구현하지않음. 아직은 데이터베이스가 없기때문.
+
+search.pug로가서 일단 .search__videos(div)를 추가. home과 똑같이 mixin부분을 넣어줌 (include도 하고)
+
+home에서 input을 통해 값을 입력하고 searh로 넘어가면 비디오가 보임.
+
+< Join >
+
+누군가가 회원가입을 하면, 자동으로 Login을 하고나서 Home 화면으로 이동하고 싶다.
+
+Join화면에서 Full Name, email, password, verify password를 입력하고 Join Now를 클릭하면
+
+/join으로 POST할 수 없습니다 라는 에러가 보인다. 
+-> /join 경로로 POST 하기 위한 설정이나 코드가 없기떄문
+
+join의 이름을 더정확히 getJoin으로 바꿈, postJoin도 사용할거기때문.
+
+
+userController에 join을 getJoin으로 바꾸고 새롭게 export const postJoin~~ 라는 함수생성.
+
+globalRouter에도 userController와 연결하기위해 새롭게 import해줌.
+
+get, post각각 경로 생성.
+->
+globalRouter.get(routes.join, getJoin);
+globalRouter.post(routes.join, postJoin);
+
+다시 userController로 돌아와서
+
+postJoin의 함수내용을 작성한다. 
+
+console.log(req.body); 넣고 서버를 실행해봄.
+
+다시 한번 join에서 정보를다채워넣고 Join Now를 하면 이번엔 콘솔에서 req.body에 대한 내용을 볼 수 있다.
+
+우리가 입력한 모든 값이 객체형태로 콘솔에 찍혀나오는걸 확인할 수 있음.
+
+콘솔에서도 알겠지만 그냥 join으로 접근하는건 GET방식이고 form에있는 데이터를 전송하여 join에 다시 접근하는것은 POST이다.
+
+여기서 우리가 처음 설정해놓은 middleWare에 대해 잠시 짚고 넘어가야한다.
+->
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.js에서 작성한 npm을 통해 install한 middleWare이다. 
+
+해당코드를 지우고 form데이터를 POST형식으로 전송하면 객채형으로 req.body내용이 표시되지않는다. undefined로 뜸.
+
+console.log(req.body);를 통해 우리가 모든 정보들을 req.body에서 가져와야하는것을 알게되었다.
+
+이전에도 했듰이 es6(ECMAScript6)를 이용해 req안에있는 body에서 name, email, password, password2를 가져올 수 있음.
+->
+const { bdoy: { name, email, password, password2 } } = req;
+-> req에서 req.body에있는 name, email, password, password2를 객체선언 하는걸 es6로 나타낸 부분.
+
+password와 password2가 같은지 체크해야함. 다르면 로그인 시킬 수 없음.
+
+if 조건식을 사용하고, 만약 다르다면 잘못되었다는 상태코드를 전달할거임.
+
+상태코드 (status code)는 인터넷이 서로 어떻게 상호작용하는지 표시하는 것이다. 
+-> 여러가지 코드가 있지만 400의 경우 잘못된 요청이라는 뜻.
+
+이렇게 상태코드를 보내는 것을 res에서 할 수 있다.
+
+사용자의 비밀번호가 잘못되었다면, 400으로 상태코드를 등록하고, join화면을 render한다.
+
+페이지에 에러를 전달하는건 좋은 일이다.
+
+else로 비밀번호가 같다면 redirect한다 home으로. 우리는 routes.js에 경로를 모아뒀기때문에 routes를 import하여 사용하면됨.
+
+if (password !== password2) {
+    res.status(400);
+    res.render("join", { pageTitle: "Join" });
+} else {
+    res.redirect(routes.home);
+}
+
+다음과 같은 조건문을 postJoin 함수에서 사용. redirect는 말그대로 결과로 지정된 URL로 돌아가는것
+
+우리의 경우 join now를 누르면 login이 된상태로 home으로 돌아가는걸 목포로 하고있고 
+
+회원가입이 완료되어 join now를 누르면 redirect로 home으로 가게 설정해준것이다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
