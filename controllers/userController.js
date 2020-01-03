@@ -12,7 +12,7 @@ export const postJoin = (req, res) => {
     res.status(400);
     res.render("join", { pageTitle: "Join" });
   } else {
-    //To Do = 해야되는 일.
+    //To Do = 해야되는 일
     //To Do: Register User
     //To Do: Log User in
     res.redirect(routes.home);
