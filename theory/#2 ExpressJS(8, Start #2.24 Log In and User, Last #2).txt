@@ -1,0 +1,72 @@
+< Login >
+
+Join은 완료했고 Login을 할 차례. 로그인도 Join과 비슷한 작업을 해야한다.
+
+postLogin 함수를 만들자 (userController.js) 
+-> getLogin, postLogin으로 함수 생성.
+
+postLogin 함수는   res.redirect(routes.home); 과같이 내용작성.
+
+form에 정보를 입력하고 post로 데이터를 넘기고 로그인이 성공하면 home으로 가야되기때문.
+
+나중에는 사용자 비밀번호가 데이터베이스에 있는 것과 같은지 검사해야한다. 지금은 테스트니까 일단 redirect하는걸로.
+
+만약 로그인과정에서 에러가있으면 다시 login화면을 표시해야한다. ( 지금은 테스트니까 나중에 추가 )
+
+globalRouter로 이동하여 login을 getLogin으로 바꾸고 postLogin도 하나더 추가.
+
+서버를켜서 테스트를해보면 login폼에서 Log in을 누르면 home으로 돌아감. 
+
+이제 header 템플릿으로가서 이 navigation을 조금 수정한다.
+
+header로가서 login, join을 링크로 표시해주는 .header__column 부분을 수정한다.
+
+로그인이 정상적으로 돼었을때, 로그인이 아닐 때 보이는 header부분이 달라야되기때문.
+
+if/else문을사용하고 if조건으로는 !user.isAuthenticated (로그인 상태가 아닐때) 
+-> Join, Login 표시
+
+else일때 로그인상태에서 보여지는 링크를 띠운다.
+-> Upload, Profile, LogOut 표시
+
+user에 대한 정보가 없기때문에 middlewares.js에서 res.locals.user를 만들고 isAuthenticated : true, id: 999인 객체를 입력한다.
+
+middlewares.js를 거치고 경로들로 접속하기 때문에 locals로 설정한 모든것을 사용할 수 있다.
+
+테스트를 위해 만드는 가짜정보이고 실제 사용자 정보가 있으면 대체될 코드이다.
+
+여기서 문제가 하나있다. profile 링크를 눌러서 이동해보면 /:id 주소로 이동한다. 
+->profile을 크롬기준(f12 검사) 해보면 a href="/:id"로 되어있음. 이것을 미들웨어에 설정된 id가 url에 들어가도록 하고싶음.
+
+만약 user에 id가 있다면 id가 포함된 주소로 가도록 하고싶다.
+
+해당 링크는 route에 대한 설명이 아니라 실제 route의 실행이 필요함. id가 url에 들어가도록 수정해야한다.
+
+routes.js로 이동하여 const routes로 선언한 객체에서 userDetail에 대한 부분을 함수로 수정한다.
+
+객체에 대한 함수선언은 다음과 같이한다
+
+userDetail: id => {
+if (id) {
+   return `/users/${id}`;
+} 
+else {
+    return USER_DETAIL;
+}
+
+인자로 id를 받고, id가있으면 id를 포함한 주소를 return하고 아니면 USER_DETAIL(/:id)를 return함.
+
+이렇게 rotues.js에 함수 선언을했으면. 이제 사용할차례다 실제로 실행시켜야함.
+
+userRouter.js로 가면 routes.UserDetail에대한 경로가 있는데 이경우에는 id를 인자로 받아 실행하지 않으니 /:id를 받음.
+
+하지만 템플릿(pug)에서 접근하는건 인자가 필요하다.  a(href=routes.userDetail(user.id)) Profile 이렇게 수정.
+
+locals에 객체화해둔 id(999) 즉 user.id를 userDetail의 인수로 넘겨줌 거기에선 id로 인식. 수정후 Profile 링크를 클릭.
+-> 제대로 /users/999로 이동하면서 userDetail.pug의 내용을 출력함.
+
+이제 /:id와 관련된것들도 모두 수정해야한다. videoDetail도 함수화시켜서 수정.
+
+지금은 가짜데이터로 작업하지만, 이런 방식으로 하면 나중에 실제데이터가 있을 때 빠르게 작업할 수 있다.
+-> 데이터베이스 부분만 추가하면 되기 때문.
+
