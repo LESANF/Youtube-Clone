@@ -70,3 +70,86 @@ locals에 객체화해둔 id(999) 즉 user.id를 userDetail의 인수로 넘겨�
 지금은 가짜데이터로 작업하지만, 이런 방식으로 하면 나중에 실제데이터가 있을 때 빠르게 작업할 수 있다.
 -> 데이터베이스 부분만 추가하면 되기 때문.
 
+==========================================#2.24 End==================================
+
+로그인성공 -> Profile 링크 클릭 -> 사용자 정보확인가능 ( 메커니즘 구현. 실제내용X 가짜 db로 테스트중 )
+
+UserDetail 페이지는 잠시 놔두고, 누군가 비디오를 클릭하면 비디오 상세 페이지로 보이도록 하고싶다.
+-> mixin 수정.
+
+videoBlock.pug로 이동하여 video, h4, h6내용을 모두 a링크 안쪽으로 넣음. 
+-> 주소는 a(href=routes.videoDetail(video.id))
+
+mixin 인자로 들어올 id를 home.pug에 +videoBlock에도 추가해야함. id : item.id <<
+
+routes.js에 경로들을 함수로 만들었으니 함수를 실행시켜야함 videoRouter.js에 videoDetail을 videoDetail()로 함수실행처리.
+
+함수로 바꿧으니 그냥 경로에있는 videoDetail을 바꿔줘야함. 
+-> 정상적으로 db.js에 있는 id로 연결된다 videos/11111 같이.
+
+< Log Out >
+
+로그아웃을 클릭하면 home으로 redirect하기전에 로그아웃 처리를 먼저한다음 redirect한다.
+
+userController.js로 이동하여 함수를 수정한다. res.render를 없애고 res.redirect(routes.home)작성. home으로 redirect
+
+//To do : Process Log Out
+
+로그아웃 처리하는걸 할 일로 남겨만 두자.
+
+Logout페이지가 쓸모가 없기 때문에 (바로 리다이렉트하기때문) Logout.pug 삭제
+-> 만약 로그아웃하기전에 "너는 로그아웃 하겠니?" 라는 알림창이나 메시지를 남기고싶으면 페이지를 삭제안하고 설정할 수 있음.
+
+logout을 눌러보면 home으로 리다이렉트 되는걸 확인할 수 있다.
+
+< Upload >
+
+upload 링크를 누르면 경로가 없다고 뜰것이다.
+
+이유는 /upload이기 때문. 정확한 경로는 videos/upload
+
+header.pug로 돌아와 Upload의 링크에 `/videos${routes.upload}`로 재정의. routes.upload = /upload
+
+Upload.pug로 돌아와 form 내용은 `/videos${routes.upload}`로 보내고 있다.
+
+이요청에 응하기위해 post형식의 접근이 필요하고 앞선 join, login처럼 get,postUpload 경로를 잡아주고 
+
+videoController에 함수를 수정해준다.
+
+기존에 있던 Upload를 getUpload로 수정하고 postUpload함수도 추가한다.
+
+데이터를 넘길 post함수를 수정해보면, form에서 받아 다시 객체화시킬것은 file, title, description이다. es6문법으로 객체화시킨다.
+
+나중에 할일을 적어두자 업로드, 비디오 저장.
+
+비디오를 업로드한다고 가정해보자, 비디오에 해당하는 id를 가질수 있을 것이다.
+
+video가 새로 생성되고, 생성된 데이터의 id를 가져오는 거다.
+
+업로드 후에 사용자를 새로 생성된 비디오 id에 해당하는 videoDetail 페이지로 redirect 할 것이이다.
+-> 
+사용자가 비디오를 업로드 하고 나면, 새로운 id를 반환하고, 업로드 후에 사용자가 업로드한 비디오의 videoDetail 페에지로 이동시켜준다.
+-> res.redirect(routes.videoDetail(111111));  / routes를 쓰기위해 import해줌.
+
+파라매터로 111111을 준건 가짜 데이터의 id이다 redirect시 111111로 가는지 확인하기위하여 직접 넣은것. 메커니즘을 알기위해서 넣어본것.
+
+Upload링크를 눌러서 get으로 접근하고 Upload Video버튼을 누르면 post식으로 redirect하여 `/videos/${id}`로 리턴. id=111111
+
+111111 id는 내가 방금 업로드한 비디오의 id가 될것이다.
+
+* 정리 *
+
+컨트롤러에서 많은 작업을했다 redirect같은 작업들, Profile을 클릭하면 사용자 정보 페이지(User Detail)로 이동한다.
+
+Upload, Log Out도 각각맞는 함수를 작성했다. 이제 보안을 신경써봐야 한다.
+
+정보를 아무것도 입력하지 않고 Upload를 클릭해도 비디오 상세 페이지로 이동한다. 이것은 올바르지않다.
+
+input들에게 required=true를 추가해준다.
+
+upload에선 file, title, description / Join에선 name, email, password, password2 / login에선 email, password
+
+editProfile같은 경우는 required같은게 필수가아님.
+
+=================================END #2 EXPRESS ================================
+
