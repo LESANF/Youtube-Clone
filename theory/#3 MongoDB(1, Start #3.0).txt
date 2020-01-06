@@ -1,0 +1,115 @@
+< mongoDB >
+
+몽고 DB 다운로드 
+
+몽고디비는 NoSQL로 분류된다.
+
+Community Server를 다운로드한다.
+
+mongo를 입력해 들어가고 exit로 나올 수 있다.
+
+< Mongo를 JS와 연결하는 방법 >
+
+2가지가 있다.
+
+하나는 몽고디비고 다른하나는 JS의 nodeJS다
+
+몽고디비는 C++이나 다른걸로 만들어졌기 때문에 Adapter가 필요하다.
+
+JavaScript에서 MongoDB와 연결하려면 Adapater를 통해야 한다.
+
+JS코드를 작성하고 싶으면 몽고디비로부터 Instruction(명령, 지시)를 받아야 한다.
+
+그리고 이건 Mongoose라는 친구가 해줄 것이다.
+
+Mongoosejs = NodeJS를 위한 Object Modeling이다.
+->npm install mongoose로 설치
+
+한가지는 몽고디비, 다른한가지는 몽구스 그리고 Database를 가지고 이용하려면 둘 다 필요하다.
+
+만들어놓은 db.js내용을 모두 지우고 진짜 MongoDB를 연결하자.
+
+정리해보면 MongoDB는 Database이고, Mongoose는 Database와 연결하게 해주는거다.
+
+몽고디비는 NoSQL Database이고, 특징은 규칙이 적고 엄청 유연해서 많은 부분을 수정할 수 있다.
+
+반면, 어떤 사람들은 규칙이 너무 적고 모든 게 너무 크고 어떤 부분에서 실험적이여서 싫어한다.
+
+좋아하는 사람, 회사도 있지만 아닌 쪽도 있다.
+
+그리고 많은 Relationship(관계)이 필요없는 일반적인 프로젝트를 진행할 때, 몽고디비는 좋은 선택이다.
+
+같은 서버에서 다양한 종류의 Database들을 사용할 수 있다는 것을 기억해라 ( 이 강의에선 한 가지만 사용할 거지만. )
+
+============================ #3.0 END ==========================================
+
+Database에 관련된 걸 하고, 어떤 유저에게나 영상을 보고, 검색하고 수정하고 삭제할 수 있게 할 것이다.
+
+To Do list ->
+1. Database 관련 작업
+2. 누구나 사용할 수 있게 만들기 ( 영상 업로드, 시청 등 )
+
+mongoose가 설치됐고, dotenv라는 걸 설치 한다.
+
+db.js에 몽구스를 임폴트한다. import mongoose from "mongoose";
+
+mongoose.connect()입력하면 connect가 우리한테 요청하는건 string으로 된 Database이다.
+
+어디에 Database가 저장되어있는 지 알려주는것이다. Database의 URL을 적을 건데 그전에
+
+mongod를 입력해서 port를 본다. 포트번호는 27017
+
+string으로 넘겨줄 Database의 주소는 "mongodb://localhost:포트번호/Database이름' 이다.
+
+mongoose.connect("mongodb://localhost:27017/Youtube"); 를 입력.
+
+그리고 입력한 주소뒤에 
+
+,{useNewUrlParser: true,
+ useFindAndModify: false} 추가 해줌.
+
+이렇게 적은 이유는, 새로운 버전의 Mongoose는 이런 식으로 Configuration(환경설정)을 보낼 수 있다.
+
+이것들을 여기 적어놓는 이유는 이것들이 무슨 역할을 하는 지 알아서 그러는게 아니라 내가 몽고디비를 사용할 때마다.
+
+몽구스가 이야기한다 useNewUrlParser: true, useFindAndModify: false 하라고, 왜냐면 새 버젼은 이런 것들을 가지고 가지 않을거라면서
+
+이것들을 이렇게 셋팅해놓는다, 새 버전에서는 이것들이 기본적으로 되어있을거지만, 그래도 확실하게 해둔다. 이부분은 크게 신경 안써도 된다
+
+그리고 난후 다음으로 할 것은 MongoDB와의 연결을 "db"로 저장한다. const db= mongoose.connection;
+
+videoController.js에 import ~~ db 삭제 이제 필요없음. (페이크정보는 지웠기때문.)
+-> db.js를 임폴트하던걸 삭제했기때문에 데이터베이스가 끊겼음.
+
+이제 import ~~ db는 database의 init으로 갈 것이다. init에 import "./db.js"; 경로 추가 -> 데이터베이스 연결됨.
+
+< dotenv >
+
+dotenv를 설치한 이유는 가끔 네가 어떤 부분을 숨겨놓고 싶를 수 있기 떄문.
+
+지금은 mongodb://localhost:27017/Youtube (localhost에 설치된 몽고디비지만 다른 곳에 설치 되면 어떻게 될까)
+
+네 코드에 있는 URL로 부터 유저 데이터를 보는 걸 원하지 않을 것이다.
+
+만약 네가 Open-source 프로젝트를 하고 있을 경우, 그런데 네 Database를 숨겨두고 싶다.
+
+mongodb://localhost:27017/Youtube이 파일을 Github에 올려놓으면 어디에 DB가 있는지 알게 될거다.
+
+지금은 localhost라 괜찮다. 그러나 실제 Application으로 만들었을 때 문제가 생긴다. 이럴때 dotenv를 사용한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
