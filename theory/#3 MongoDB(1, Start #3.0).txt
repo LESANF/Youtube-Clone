@@ -78,6 +78,14 @@ mongoose.connect("mongodb://localhost:27017/Youtube"); 를 입력.
 
 그리고 난후 다음으로 할 것은 MongoDB와의 연결을 "db"로 저장한다. const db= mongoose.connection;
 
+데이터베이스에 연결이 성공적으로 연결되거나 연결 오류가 발생하면 알림을 받아야합니다.
+
+db.once("open", handleOpen);
+-> 데이터베이스에 연결됐을때 handleOpen함수를 콜백 함수는 connected to DB를 console.log
+
+db.on("error", handleError);
+-> 에러발생했을떄 마찬가지로 콜백되는 부분.
+
 videoController.js에 import ~~ db 삭제 이제 필요없음. (페이크정보는 지웠기때문.)
 -> db.js를 임폴트하던걸 삭제했기때문에 데이터베이스가 끊겼음.
 
