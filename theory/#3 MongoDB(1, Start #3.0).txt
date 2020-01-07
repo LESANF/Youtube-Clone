@@ -169,7 +169,7 @@ import moongse from "mongoose"를 해주고
 해야 할 것 하나는 model 즉 document name이고 다른 하나는 schema, schema는 형태이다. model은 그냥 실제 data
 
 --------------------------------------------------------
-const VideoSchema = mongoose.Schema({
+const VideoSchema = new mongoose.Schema({
 
    이안에 schema를 정의하자 이건 이렇고 저건 저렇고 ~ 이런식으로
 
@@ -209,22 +209,108 @@ init.js로와서 import해줌. import "./models/Video";
 
 ============================ #3.3 END ==========================================
 
+< Comment model >
+
+Video와 똑같이 models에 파일생성 Comment.js
+
+CommentSchema = new mongoose.Schema~~ 생성해주고, text와 createdAt 객체생성.
+
+text는 타입 string과 입력안하면 에러를 반환하는 required, createdAt도 Video와 똑같이 타입 Date, 기본값은 현재시간받아오는 객체함수(Date.now)
+
+이렇게 객체로 묶어서 두줄이상 쓰는것과 앞선 description : String과 같이 한 줄로 끝나는 것의 차이가 있다.
+
+무언가 줄 option이 있으면 객체(object)로 만들어야한다. 그렇지 않으면 description과 같이 한 줄이면 충분하다. 
+
+Video.js의 views를보면 default를 추가하거나, 다른것들처럼 required를 추가하는 건 configuration(구성) object이다.
+
+그리고 이제 알아야하는건 data의 relationship(관계)에 대한것이다.
+
+한쪽에서 video를 생성하고, 다른쪽에서 comment를 생성했을 때 둘을 어떻게 연관(relations)시킬까?  그게 문제다.
+
+생성된 video와 video에 달리는 comment사이에 어떠한 관계가 있는데 이걸 어떻게 연관시킬까
+
+- video가 comment ID의 array를 가지고 있는것.
+
+- comment에 video의 ID를 저장하는 방법
+
+어떤 게 어떤 것과 연결되어 있는 지 알아야한다 video(영상)에 comment(댓글)를 달 때.
+
+Comment.js는 그대로 두고, Video.js에선 모든 comment ID가 담긴 array를 추가하는 것
+
+모든 object들은 보통 ID를 가지고 있다. 우리의 이름처럼, 따라서 모든 comment의 정보를 저장하는 대신 
+
+모든 video들이 comment id들을 가지고 있는 거지. 처음 video를 생성하면 comments는 0이다.
+
+말그대로 comment가 없기 때문. 그리고 나서 누군가 댓글(comment)를 해당 video에 생성하면, 새로운 comment ID를
+
+video안에 있는 comment의 list라는 곳에 저장하는 것이다. 그러면 comment는 1이되는 것이지.
 
 
+-------------------------------------------------------------------------
+방법1
 
+Comment.js에 createdAt다음 video객체 추가 (이 comment는 이 video와 연결되어 있고)
 
+video의 type=mongoose.Sechema.Types.ObjectId 작성.
 
+어떤 object ID가 어디서 온건 지를 알려줘야겠지. 어느 model에서 온건지.
+-> ref : "Video"
 
+ref의 Video와 Video.js에서 model로 선언한 const model = mongoose.model("Video", VideoSchema);에서의 "Video"가 같아야한다.
 
+video : {
+type: mongoose.Sechema.Types.ObjectId,
+ref: "Video"
+}
 
+는 ↓↓↓↓↓↓↓↓ 
 
+video : 1 
 
+기본적으로 Database에는 이런식으로 저장된다
 
+그리고 mongoose에게 말한다 ID 1에 해당하는 Video를 가지고와라.
+-> 그래서 ref를 사용하는 것이다.
+                 ↓
+실제로 우리는 Video의 ID를 원하기 때문.
 
+좋아요를 저장하거나, 유저를 저장하거나 할 땐, 다른 ref를 사용할것이다.
 
+여기까지가 첫번째 방법. 순서대로 정리해보면
 
+comment를 생성하면 text와 createdAt를 생성하고 video ID는 1
+----------------------------------------------------------------------------------
 
+방법 2
 
+이번에는 Object ID 들의 array를 생성해야 한다.
+
+Object ID들을 Video.js에 배열로 넣을거기 때문.
+
+이번엔 반대로 ref는 Comment이겠지. 
+
+마찬가지로 createAt다음
+
+ comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }
+  ]
+
+해당 코드 삽입. 배열로 저장하는것을 잊지말자.
+
+--------------------------------------------------------------------------------
+
+마지막으로 정리해보자면 이렇게 방법1, 2가 있다.
+
+Comment ID들을 array로 video에 집어 넣을 것인가 or 혹은 Comment에 연결 된 Video ID를 줄 것인가.
+
+ObjectId식으로 넣게되면 모든 Comment의 정보를 넣는게 아니라 Comment의 ID만 넣는것이다.
+
+예를들어 [1,2,4,7] 이런 식으로 Video와 연결된 Comment들의 ID가 저장된다.
+
+============================ #3.4 END ==========================================
 
 
 
