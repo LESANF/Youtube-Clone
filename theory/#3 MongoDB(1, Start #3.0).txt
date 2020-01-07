@@ -134,6 +134,98 @@ const PORT = process.env.PORT || 4000; env의 PORT로 연결하고 안되면 400
 
 ============================ #3.2 END ==========================================
 
+아래 두 가지 import 방식에 대한 차이.
+
+import X from "./Y"
+
+import "./Y"
+
+
+첫 번째는 내가 ./Y에서 X를 가져올때, 나는 무언가에 X를 사용하고 싶을 때 사용
+
+두 번째는 내가 ./Y를 가져온다면, 단지 파일을 가지고오는것. 
+
+MongDB의 장점은 document를 줄여준다는 것이다. documnet는 JSON file, package.json 같은.
+
+이것이 몽고디비가 완벽한 이유다.
+
+하지만 몽고디비에 우리의 파일들이 어떤 식으로 생겨야 할 지 알려줘야 한다. 아무거나 생성 못함. (어느정도 타당성이 필요)
+
+ex) 몽고디비야, 우리의 file들은 video라는 이름을 가질거야 (=video.js)
+
+그리고 모든 video들은 string type을 가질것이다. 그 string의 이름은 title일거다.
+
+video는 view를 가질거고 view는 number, 이런게 file의형태, 즉 model의 형태다.
+
+---------------------------- 
+
+이런것들은 models라는 폴더에 저장될것이다. 
+-> models폴더생성 후, Video.js file 생성
+
+models에선 대문자로 시작할거다, 그리고 Video.js에서 내 Video들의 형태를 정의할것.
+
+import moongse from "mongoose"를 해주고 
+
+해야 할 것 하나는 model 즉 document name이고 다른 하나는 schema, schema는 형태이다. model은 그냥 실제 data
+
+--------------------------------------------------------
+const VideoSchema = mongoose.Schema({
+
+   이안에 schema를 정의하자 이건 이렇고 저건 저렇고 ~ 이런식으로
+
+});
+--------------------------------------------------------
+
+Video는 먼저 fileUrl을 가질건데 여기서 유의할건 Database에 영상(bytes)을 저장하지 않을것이다.
+
+영상의 link(주소)를 저장할거임. 영상을 저장해버리면 너무커짐. 우리의 경우에 우리 서버에 Video를 저장하는거다.
+
+fileUrl의 type은 String, required: error message, fileUrl 값이 없는 Video를 생성하려 한다면
+
+required에 의해 error message를 받는다.
+
+title도 가질것이고 type은 string required도 설정.
+
+description : string, 설명은 꼭 필요하지 않으니 required는 뺌.
+
+views의 type은 Number, default:0으로 설정. ( 처음 비디오를 올리면 조회수가 0이기 떄문 )
+
+createdAt은 영상을 등록했을때 현재시간 Date.now함수로 가져옴. 
+
+type은 Date, default : Date.now
+
+이런 객체의 종류를 더 알고싶으면, https://mongoosejs.com/docs/guide.html 에서 schemas 쪽을 보면 다나와있다.
+
+이제 스키마가 만들어졌고 model을 만들어야한다.
+
+definition(정의)를 통해 실제 document를 만드는것, schema가 definition 같은 것이다.
+
+model의 이름은 Video, Video model의 schema는 VideoSchema
+-> const model = mongoose.model("Video", VideoSchema);
+
+그리고 export default model 해줌. 여기까지하면 아직 Database는 model을 생성한걸 인식하지 못함
+
+init.js로와서 import해줌. import "./models/Video";
+
+============================ #3.3 END ==========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
