@@ -106,17 +106,33 @@ mongodb://localhost:27017/Youtube이 파일을 Github에 올려놓으면 어디�
 지금은 localhost라 괜찮다. 그러나 실제 Application으로 만들었을 때 문제가 생긴다. 이럴때 dotenv를 사용한다.
 
 
+============================ #3.1 END ==========================================
+
+< dotenv >
+
+dotenv를 구성하기 위해 처음으로 해야 할건 .env파일 생성 이름은 environment나 secret도 가능하다.
+
+.env파일 안에 MONGO_URL= 으로 변수선언하고 안에 database주소 넣음. 
+->"mongodb://localhost:27017/Youtube"
+
+그리고 PORT도 선언 
+-> PORT=4000
+
+db.js로가서 import해주자 
+-> import dotenv from "dotenv";
+
+그리고 dotenv.config()라는 함수로 .env 파일 안에 있는 정보를 불러올 수 있다.
+
+process.env.MONGO_URL을 원래 주소있던 자리에 넣음.
+
+git에 올릴떄 보이지않게 하기위해 gitignore에도 .env를 추가하고 init으로 가서 db.js같이 dotenv를 import하고
+
+저장해둔 port를 process.env.PORT로 대체한다.
+
+const PORT = process.env.PORT || 4000; env의 PORT로 연결하고 안되면 4000으로 하라는 뜻
 
 
-
-
-
-
-
-
-
-
-
+============================ #3.2 END ==========================================
 
 
 
