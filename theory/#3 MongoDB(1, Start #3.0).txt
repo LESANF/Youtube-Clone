@@ -312,6 +312,97 @@ ObjectId식으로 넣게되면 모든 Comment의 정보를 넣는게 아니라 C
 
 ============================ #3.4 END ==========================================
 
+위와같이 만들어둔 Model들을 어떻게 사용할 수 있을까 ?
+
+videoController.js에서 보자. 누군가 home으로 가면 render의 videos(videos:videos)는 undefined일것이다.
+
+search도 마찬가지. 이유는 videos is not defined
+
+import Video from "../models/Video" 추가. 이건 단지 Database의 속성이 아니라 단지 model이다. 아예 다름.
+
+element를 받는 통로일 뿐이지 element 자체는 아니다.
+
+여기에 새로운 javascript요소인 async라는걸 추가한다.
+
+async(비동기)는 너를 기다려주는 무언가이다. async의 위치는 함수 앞
+
+만약 async를 사용하지 않고 const home 내부에 videos를 보라는 조건을 넣어두면, JS는 default(기본적)으로 너를 기다리게 프로그래밍되어있지 않다.
+
+JS는 default로 Video를 살펴보기 시작하지만, 살펴보는거 끝나기를 기다리지 않는다.
+
+다음으로 넘어가서 Video가 없는 페이지를 render하지, 아직 Video를 다 살펴보지 못했거든.
+
+왜냐하면 JS는 한번에 많은 일을 할 수 있기때문이다. 이것은 엄청난 것이고 알아두어야 할 내용.
+
+그래서 JS는 기다리지 않는다. 일단 Video를 살펴보고 있으니, 다음 render작업도 같이 할게 라고 받아들여진다.
+
+우리는 JS가 우리를 기다리게 해야 한다. 그렇게하려면 async라는 keyword를 추가해야지.
+-> async는 JS야 이 function의 어떤 부분은 꼭 기다려야 해! 라고 말하는 것과 같다.
+
+이제 비동기식을 작성하자, await를사용 
+-> const videos = await Video.find({}); 이렇게 하면 Database에 있는 모든 Video를 가져올거야.
+
+이과정을 마치게되면 videos가 정의되었고 이는 render의 videos로 쓰인다. async를 쓰지않으면 에러가난다. await는 async없이 못쓴다.
+
+이제 videos가 정의되었기 때문에 연결이되었지만, videos는 빈 array다. 생성된 video가 없기때문. 실제로 console.log(videos)를 찍으면 빈 배열임 []
+이 async, await부분은 JS에서 엄청나게 매력적인 부분이다. 네 코드를 멋지게 만들어주기 때문. 
+
+awiat부분이 끝나기 전까지는 render부분을 실행하지 않을것이란 걸 확실하게 보여준다.
+
+그렇다고 해당 과정이 성공적으로 끝나야 하는것은 아니다. 그냥 끝날 때까지 기다리는거임. 성공하든 안하든
+
+예를 들면 error가 생겨도 다음 render 부분을 실행한다. 왜냐면 끝났으니까. 성공적으로 끝난게 아니라 그냥 끝났으니 다음걸 실행했기 때문.
+
+위와 같은 방법으로 짜는 것은 좋지않다. 발생할 수 있는 모든 error를 잡아야 함.
+
+그래서 try catch를 사용할 것. 
+
+try 는 우리가 해야 할 것들 그리고 만약 실패한다면 해당 error를 (catch)잡아낼거다. 그래야 우리가 무슨 error인 지 볼 수 있어서.
+
+  try {
+    const videos = await Video.find({});
+    res.render("home", { pageTitle: "Home", videos });
+  } catch (error) {
+    console.log(error);
+    res.render("home", { pageTitle: "Home", videos: [] });
+  }
+
+이런식으로 작성하는데 에러가 없을경우 try처럼 videos를 정상적으로 render할것이고.
+
+console.log로 error를 출력하고
+
+error가있으면 video는 없을것이고, videos가 빈배열 []인상태로 render 될것이다.
+
+여기까지 두 가지를 배웠다.
+
+첫 번째는 async와 await. awiat는 해당 과정이 끝날 때까지 기다리게 하는 거고 성공이나 실패여부가 중요한게 아니라 끝났다는게 중요하다.
+
+두 번째는 try catch, error가 생기면 default로 우린 잡아내지 못한다. 이건 NodeJs의 문제이다. 엄청 중요한 error가 있고 우리가 잡아내지 못한다면
+
+NodeJS는 불평할 것이고 모든게 망가질것이다.
+
+에러에 대한 예를 들어보자 다음과 같은 코드로 함수를 다시작성.
+
+const videos = await Video.find({});
+throw Error("This is error from throw !");
+res.render("home", { pageTitle: "Home", videos });
+
+페이지를 새로고침하면 연결되지않는다. 그리고 터미널에 에러메시지가 찍힘.
+
+UnhandledPromiseRejectionWarning: Error: This is error from throw ! 
+
+내가 던져놓은 에러메시지가 콘솔에 출력. 해당에러의 세부내용을 보면
+
+해당 error는 catch block이 없는 async function의 안에서 나온 겁니다. catch가 없어서 그런거임. #7분부터 보기#
+
+
+
+
+
+
+
+
+
 
 
 
