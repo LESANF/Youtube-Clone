@@ -397,8 +397,22 @@ UnhandledPromiseRejectionWarning: Error: This is error from throw !
 
 그래서 우리는 error를 최선의 방법으로 잡아냐애한다. (try, catch를 사용한 코드처럼)
 
+다음과 같은 코드에서는 home에 연결된다.
 
+try {
+    const videos = await Video.find({});
+    throw Error("This is fake");
+    res.render("home", { pageTitle: "Home", videos });
+  } catch (error) {
+    console.log(error);
+    res.render("home", { pageTitle: "Home", videos: [] });
+  }
 
+기존 코드에 throw Error("This is fake"); 에러를 던져줌. 이게 연결되는 이유는 error가 NodeJS를 망가뜨리지 않기때문
+
+앞의 코드는 catch를 사용하지않은 코드라서 연결안됨.
+
+============================ #3.5 END ==========================================
 
 
 
