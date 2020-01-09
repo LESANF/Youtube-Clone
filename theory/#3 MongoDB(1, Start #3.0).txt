@@ -393,7 +393,9 @@ UnhandledPromiseRejectionWarning: Error: This is error from throw !
 
 내가 던져놓은 에러메시지가 콘솔에 출력. 해당에러의 세부내용을 보면
 
-해당 error는 catch block이 없는 async function의 안에서 나온 겁니다. catch가 없어서 그런거임. #7분부터 보기#
+해당 error는 catch block이 없는 async function의 안에서 나온 겁니다. catch가 없어서 그런거임. 
+
+그래서 우리는 error를 최선의 방법으로 잡아냐애한다. (try, catch를 사용한 코드처럼)
 
 
 
