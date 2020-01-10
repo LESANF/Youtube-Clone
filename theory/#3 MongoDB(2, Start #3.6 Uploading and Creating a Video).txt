@@ -120,3 +120,15 @@ newVideo가 정의되고 redirect로 응답한다. videoDetail()함수의 매개
 비디오가 생성되고 videoDetail로 들어가면 생성된 id주소값이 URL에 찍혀나옴.
 
 ======================#3.6 END============================
+
+이제 비디오를 업로드 할 수 있지만, home으로 가면, video들이 나타나지 않음. 왜냐하면 link가 망가졌기 때문.
+
+videos 폴더를 삭제하고, middleware에서 video/ 가아닌 uploads/videos/에 업로드하게 수정할 것이다.
+->dest : "uploads/videos/"로 수정.
+
+여기서 주의할점. /uploads/videos로 쓰면안됨. 이렇게 써버리면 해당 위치가 네 project file 안에 있는 directory라고 생각하기 때문.
+
+/uploads/videos로 쓰면 내 컴퓨터의 root에 upload를 만들것이다.
+
+그 다음 해결할 문제는
+
