@@ -175,3 +175,5 @@ user file들을 우리의 website에 저장해야하는걸 의미하는건 아�
 github에 내 동영상이 올라가는걸 원하지 않으니 ignore에 uploads추가한다.
 
 그리고 home.pug에 videoFile : item.videoFile에서 item.fileUrl로 수정.
+
+======================#3.7 END============================
