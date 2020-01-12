@@ -177,3 +177,101 @@ github에 내 동영상이 올라가는걸 원하지 않으니 ignore에 uploads
 그리고 home.pug에 videoFile : item.videoFile에서 item.fileUrl로 수정.
 
 ======================#3.7 END=============================
+
+video링크를 눌러 videoDetail로 들어가서 URL을 확인해보면 Video의 ID를 받는다.
+
+그리고 목표는 Video의 자세한 정보를 생성하는거겠지.
+
+우리는 이미 Video ID를 위한 controller를 가지고 있다 ( videoController.js -> const videoDetail )
+
+controller가 준비되어 있으니 우리는 ID를 받아야 한다. ( ID는 URL에 있는 ID )
+
+search에서 searchingBy를 받은 것처럼 Video ID를 받는다.
+
+params로 id에 접근할 수 있다. videoDetail controller에 console.log(req.params)를 하면
+
+{ id: '5e1b2ee3612fb70df006b2d2' } 다음과 같은 id값을 받을 수 있음. 보면 알겠지만 req.params의 이름은 id: 이다.
+
+왜냐하면 나의 routes.js에 (const VIDEO_DETAIL = "/:id";)를 보면 "/:id"를 가지고 있다. 그래서 내가 id를 주시하고 있는것을 안다.
+
+:id가 variable(변수)라는거다. 그래서 여기에 넣어 놓은거고, 만약 "/:id/edit"으로 간다면, edit이라는 매개변수는 어떤 것도 받지 않음.
+
+하지만 ID로는 어떤 변수를 받겠지. 만약 controller에서 어떤 data를 가지고 있다는 것을 표현하고 싶다면 더블콜론(:)과 이름을 넣으면 됨.
+
+const VIDEO_DETAIL = "/:id";의 주소를 "/:apple"로 수정하고 req.params를 호출하면. apple: '~~~'로 된다. 
+
+이게 URL로 부터 정보를 가져오는 유일한 방법이다.
+
+videoDetail 컨트롤러에 다음과 같이 params의 id값을 선언
+
+const {
+    params: { id }
+  } = req;
+
+그리고 함수앞에 async추가, 왜냐하면 await function을 쓰기위해서 (async, await는 같이써야함.)
+
+const video = await Video.findById(id); 선언. findById에 관한 설명은 mongoose로 가면 볼 수 있음
+
+findById()에 들어가는값은 위에서 const로 선언한 id이다. params로 선언했듯이 /:id를 변수로 보기때문에
+
+routes.js에서 /:변수명 으로해놓으면 params로 긁어 올때 { 변수명 : ~~ }으로 긁어온다. 우리는 /:id로 해놨기때문에
+
+id로 선언했고, 역시 findById(id)로 선언했다. 생성한 video를 보면(Video.findById한것) 우리가 넣어놓은 Database를 잘찾았다.
+
+만약 존재하지 않는 값을 findById에 넣으면 에러가뜬다. ObjectId를 못찾기 때문.
+
+웹에있는 URL에 수동으로 다른 id값을 바꿔도 에러가뜬다. 이제 우리가 해야될 것은 에러를 잡는다 
+-> try catch
+
+try{} catch(error){}로 선언.
+
+만약 id를 옳게 찾았으면 render한다 videoDetail페이지와 우리가 await(비동기식)으로 선언한 video를.
+
+그리고 존재하지 않는 id, 즉 error가 발생하면 console.log로 error를 보여주고 redirect한다 home으로 
+
+videoDetail로 이동하면 Video Detail만 보일것이다.
+-> block content
+    p hello! i'm videoDetail 이렇게 block에 해당 p태그만 넣어놔서.
+
+우리는 여러 요소들을 넣을거임 ( 타이틀, 조회수, 유저아바타, 유저이름, 댓글 등등 )
+
+    .video__player
+        video(src=`/${video.fileUrl}`)
+    .video__info
+        a(href=routes.editVideo) Edit video
+        h5.video__title=video.title
+        span.video__views=video.views
+        p.video__description=video.description
+
+다음과같이 videoDetail.pug에 block content에 추가.
+
+video(src=`/${video.fileUrl}`) 다음과같이 video.fileUrl이 아닌 /을 붙여주는 이유는 정대경로를 만들기위함이다.
+
+만약 video(src=video.fileUrl)이면. http://localhost:4000/videos/uploads\videos\id로 나오고
+
+video(src=`/${video.fileUrl}`) 이면 http://localhost:4000/uploads\videos\id로 나온다.
+
+두 링크의 차이는 videos가 있냐 없냐다. 우리는 mongoDB서버에 데이터베이스를 생성하고 거기서 video객체를 뽑아쓴다.
+
+데이터베이스가 저장되는공간은 uploads\videos. 실제로 우리 프로젝트에 videos라는 폴더를만들어서 담는게 아니다. 
+
+그렇기 때문에 /와같은 절대경로를 만들어줘야한다.
+
+그리고 h5, span, p 태그를보면 클래스명다음 =(equals)기호가 보인다. 이건 말그대로 변수를 쓰기위함임.
+
+controller에서 render했다 findById된 객체를. 즉 내가 만든 video의 데이터베이스객체가 videoDetail로 넘어갔다는 소리
+
+그렇기때문에 videoDetail.pug에서 video.title, video.views, video.description같은 값을 뽑아 쓸 수 있는 것이다.
+
+그리고 a링크 Edit video는 이 비디오를 만든 사람한테만 보이는거임 ( 글쓴이가 자기가 쓴 글을 수정하는 것처럼 )
+
+비디오를 생성하고 그 비디오 페이지로 가면, 그 비디오를 수정할 수 있는 버튼이 있길 원한다. 
+
+일단은 누구나 사용할 수 있게 만듦. (누구나 아무 비디오를 수정할 수 있는 것)
+
+나중에 user part부분에서 이 부분을 주인만 보이게 하게 할 것이다.
+
+======================#3.8 END=============================
+
+
+
