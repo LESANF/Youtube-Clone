@@ -130,5 +130,48 @@ videos 폴더를 삭제하고, middleware에서 video/ 가아닌 uploads/videos/
 
 /uploads/videos로 쓰면 내 컴퓨터의 root에 upload를 만들것이다.
 
-그 다음 해결할 문제는
+그 다음 해결할 문제는 MongoDB model이 한 document를 Database에 저장했고, 이 Document는 잘못된 URL을 가지고 있다.
 
+우리는 아직 Video를 수정하는 방법을 가지고 있지 않다. MongoDB에서 어떻게 다룰 수 있는지 보자.
+
+--------------------------------------
+터미널에서 mongo 시작 
+
+1. show dbs -> Database의 이름을 알 수 있음. (help를 쳐서 명령어를 볼 수 있다.)
+
+2. use Youtube -> show collections를 입력하면 우리가만든 videos가 나옴. collections는 model같은거다.
+
+3.db.videos.remove({})로 안에 내용을 삭제할 수 있음.
+--------------------------------------
+
+이제 upload해보면 uploads/videos들어가지만 영상 재생은 되지않을거임. 해당 주소가 망가졌기 때문.
+
+express는 모든것에 대한 Route가 있다. Uploads를 위한 기본적인 route가 필요하다.
+
+app.js에 추가한다. app.use("/uploads", express.static("uploads")); 
+
+uploads에 접근했을때, express.static을 사용한다. 이건 directorty에서 file을 보내주는 middleware이다.
+
+주어진 directory에서 file을 전달하는 새로운 middleware function, 이경우엔 어떤 종류의 controller나 view같은 건 확인하지 않는다.
+
+그냥 파일만 확인하는거다. 사용될 directory는 uploads, 이제 "/uploads"로 가면 uploads라는 directory안으로 들어간다는 것이다.
+
+이제 다시 확인해보면 Video를 다운 받아서 import 시켰다. 정상적으로 영상이 나온다.
+
+user avatar도 이것과 같은 방식으로 다루면 된다. 이렇게 app.use로 static해주는 형식은 좋은 예시가 아니다.
+
+이것처럼 user에 해당하는 file을 내 server에 저장하는 것. 이건 좋은 연습이 아니다.
+
+server의 코드는 영원한것처럼 보이면 안된다. 보통 웹사이트에서 server를 만들고 새로운 version이 나오면 새로운 서버로 redirect만 시킨다.
+
+옛날 서버와는 작별인사를 한다. 주로 이런식으로 하고 이 프로젝트도 그렇게 할것이다. 
+
+user file들을 우리의 website에 저장해야하는걸 의미하는건 아니다. user와 같은 생성된 content는 server와 분리되어야 한다.
+
+요약하잠면 이렇게 file들을 다루는건 문제가 많다. 한개의 서버에 다루는 방법은 !
+
+지금은 작동되는 결과에 만족하기 위해 사용했을뿐이다. server에서 data를 가져왔다.
+
+github에 내 동영상이 올라가는걸 원하지 않으니 ignore에 uploads추가한다.
+
+그리고 home.pug에 videoFile : item.videoFile에서 item.fileUrl로 수정.
