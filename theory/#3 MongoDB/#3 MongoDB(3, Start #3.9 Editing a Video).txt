@@ -1,0 +1,102 @@
+editVideo Controller도 id를 받는 주소기 때문에
+
+editVideo: id => {
+    if (id) {
+      return `/videos/${id}/edit`;
+    } else {
+      return EDIT_VIDEO;
+    }
+  }
+
+위 코드와 같이 수정함.
+
+editVideo를 함수형으로 만들었으니, 이제 함수를 사용해야함 videoDetail.pug에서 
+
+Edit video 링크에 주소를 함수 실행형으로 수정. 매개변수는 video.id로. 바로 매개변수를 이렇게 줄 수 있는 이유는
+
+우리가 videoController에서 videoDetail 함수를 통해 findById로 생성한 객체를 video로 선언하고 넘겨줬기 때문임.
+
+editVideo로 넘어가면 videos/id/edit로 접속되는 것을 확인할 수 있다.
+
+하지만 router설정을 안해줬기 때문에 videoRouter.js로 이동하여 몇가지 수정을 한다.
+
+routes.editVideo는 더 이상 string이 아니다. 사실은 function임. 근데 실행을 안했기 때문에 route가 이 function을
+
+참조만 하는것이다. 그냥 routes.editVideo는 Function : editVideo라고 console.log로 볼 수 있고 
+
+이제 우리는 실행시켜줘야함. editVideo()이렇게 ()안에 ID를넣는것이 아니다. Express는 매개변수를 원하지 ID를 원하는게 아님.
+
+이렇게 수정하고 웹사이트를 새로고침하고 확인하면 edit로 연결되는걸 확인할 수 있다.
+
+유저가 비디오를 수정할 때, 비디오를 업로드하는 방식은 원하지 않음. 비디오 파일을 바꾸는걸 원하지않음. (유튜브 방식)
+
+videoRouter를 수정. 기존의 editVideo를 get, post방식 2가지로 만듬. 경로가있으니 함수도 있어야함 
+
+videoController에서 기존 edit함수를 2가지 get, post식으로 나눠서 생성. videoDetail에서 한 것과 비슷하다.
+
+조금 다른점이 있다면, 링크를 눌러 editVideo로 들어온다면. 이부분은 get이고 이 때 값이 기존값이 채워져 있어야 한다.
+
+post부분은 Video를 업데이트하는 부분이다. get부분은 템플릿을 렌더링하는것.
+
+일단 get에서 id를 받아오자 parmas를 통해. ( get은 뭔가를 채워넣는 작업, post는 업데이트하고 redirect하는 작업 )
+
+id를 받아와서 id에 해당하는 Video를 불러서 const video로 선언해줌. ( title, description을 뽑아쓰려고 )
+
+* 혹시 까먹을까봐. Videos는 mongoose schema로 model로 만들어서 사용중이고 해당 페이지에서 import해서 사용중.
+
+해당 id를받아 id에 해당하는 모델을 가져오고, 해당하는 id가 없으면 수정할 비디오가 없다는 뜻이니 다시 home으로 보냄.
+
+성공적으로 id를 받아왔으면. 사용자에게 보이게 render해준다. 
+
+res.render("editVideo", { pageTitle: `Edit ${Video.title}`, video });
+
+다음과 같은 render식을 해석해보자면 editVideo로 렌더할것이고 넘겨주는건 pageTitle은 Edit텍스트와 해당 id의 비디오명, 
+
+그리고 id에 해당하는 객체 자체 video. 이것을 editVideo로 넘겨줌. 즉 editVideo에서 비디오 Object를 받음.
+
+title과 description의 기본 value값을 지정해줌 video.title, video.description으로 여기서 input은 value로 받아지나
+
+description은 value로 못받아서 변수를 추가해줌 =video.description 이렇게하면 editVideo의 input과 textarea에 값이들어가있다.
+
+비디오 수정페이지에서 제목과 설명이 현재값을 가지게 되었고, 페이지 제목도 Edit (비디오제목)으로 바뀌었다.
+
+이값을 가지고 이제 수정해서 Update Video를 누르면 post로 처리한다.
+
+브라우저에서 검사를 해보면 form의 경로는 지금 videos function을 가지고 있다. action에 해당하는 URL을 고쳐야된다. 
+
+editVideo는 함수로 만들어놨고 ()로 실행시키자. id값은 이미 알고있다. video.id를 매개변수로 넣어주자. 
+
+우리는 이런식으로 Data를 템플릿에 보내는거다. (템플릿은 editVideo, 넘겨준 data는 const video~~ findById(id) )
+
+이제 할건 실질적인 업데이트 (post)
+
+get과 같이 id를 params를 통해 받아오고 try, catch를 사용 에러가나면 home으로 redirect.
+
+우리는 만들 수 있다. redirect하는 과정을 middleware로 어떤 /id를 가도 만약 에러가 생기면 home으로 가게 redirect 시키는거지
+
+지금하는 것처럼 try, catch를 반복하지 않아도된다. 이렇게 하는방법이 있다는걸 알아보자.
+
+이제 mongoose에서 지금상황에서 사용할만한 함수를 찾아보자 -> findOneAndUpdate() 이게 우리가 사용할 함수.
+
+이것도 async, await를 통해 비동기식으로 처리 할 것이고, 따로 const로 선언하지 않는다.
+
+바로 덮어서 기존에 update하기 떄문에, 또다르게 선언할필요가 없음. findeOneAndUpdate에서 title과 description이 필요하기때문에
+
+body : {title, description}을 const선언에 추가해줌. 그리고 업데이트한 후에 redirect로 videoDetail에돌아간다.
+
+우리가 수정했으면 수정한 내용을 바로 해당 비디오 페이지에서 확인하기 위해. routes.videoDetail(id)로 리다이렉트.
+
+->     await Video.findOneAndUpdate({ _id: id }, { title, description });
+
+_id로 주는이유는 비동기식으로 해당 id에 대한 video 객체모델을 가져올때 객체를보면 id는 _id : 아이디값으로 정의되기때문에
+
+id:id 즉 id로 못받아온다. _id : id로 정해줘야 findOneAndUpdate에서 첫번째 인자로 인식함.
+
+findOneAndUpdate(arg1, arg2)함수를 잠시 보자면 2개의 인자를 받고 앞의 인자는 id로 바꿀대상, 2번째 인자는 업데이트될 인자.
+
+우리는 id에 해당하는 대상을 첫번쨰인자, 두 번째로는 첫번쨰인자에서 업데이트될 데이터를 넣음 title, description
+
+업데이트할 값을 넣고 Update video를 누르면 videoDetail 템플릿으로가고 수정되있는 title과 description을 볼 수 있다.
+
+=================================#3.9 END==========================================
+
