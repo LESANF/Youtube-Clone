@@ -100,3 +100,33 @@ findOneAndUpdate(arg1, arg2)함수를 잠시 보자면 2개의 인자를 받고 
 
 =================================#3.9 END==========================================
 
+
+비디오 삭제를 해보자. 비디오는 post할 일이 없다. get만 쓰면됨.
+
+누군가 삭제를 하면 URL로 가서 해당 부분 URL을 가져와서 해당하는 비디오를 삭제할거다.
+
+deleteVideo역시 id를 주소에 가지고 있으니 route.js가서 수정한다. id를 받을떄와 아닐 때를. 앞에서 한것과 같음.
+
+editVideo함수를 작성하면서, video 객체를 넘겼으니 delete했을때 주소를 video.id로 매개변수 줄 수 있다.
+
+그리고 videoDetail페이지에서 타이틀을 비디오명으로 나오게 수정하자. 
+
+다시 delete하는 맥락으로 돌아와서, delete로 들어가면 연결이 안된다. controller를 수정해주고 router부분에 함수실행()추가.
+
+deleteVideo 함수에서 params로 id를 받아오고 전과같이 async, await, try, catch를 사용.
+
+삭제가되든, 안되든 home으로 redirect처리 = try, catch 밖에 res.redirect(routes.home)
+
+try에서 할 부분은 해당 비디오의 URL을 찾아서 지우는 행위, 몽구스에서 제공하는 findOneAndRemove해줌. 매개변수는 _id : id로.
+
+update와 같이 그냥 업데이트하거나 지우면되니 따로 그정보를 객체에 담을 필요가없음 바로 await Video.findOneAndRemove({_id : id})
+
+실제로 지워보면 home으로 돌아가고 비디오가 사라진걸 알 수 있음.
+
+* 여기서 지울때 에러가떴는데 내실수였지만 주의하라고 한번더적어봄 editVideo에서 delete했을때 경로를 함수형으로 바꿔주고 앞에 추가해놨던 /videos 텍스트를 지워야함. 함수에서 이제 통채로 지원하기 때문에.
+
+=================================#3.10 END==========================================
+
+
+
+
