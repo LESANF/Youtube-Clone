@@ -12,9 +12,9 @@ export const postJoin = (req, res) => {
     res.status(400);
     res.render("join", { pageTitle: "Join" });
   } else {
-    //To Do = 해야되는 일
-    //To Do: Register User
-    //To Do: Log User in
+    // To Do = 해야되는 일
+    // To Do: Register User
+    // To Do: Log User in
     res.redirect(routes.home);
   }
 };
@@ -27,7 +27,7 @@ export const postLogin = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  //To do : Process Log Out
+  // To do : Process Log Out
   res.redirect(routes.home);
 };
 

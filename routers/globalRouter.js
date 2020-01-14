@@ -11,7 +11,7 @@ import {
 
 const globalRouter = express.Router();
 
-//get, post
+// get, post
 globalRouter.get(routes.join, getJoin);
 globalRouter.post(routes.join, postJoin);
 
