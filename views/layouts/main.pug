@@ -3,6 +3,7 @@ html
     head
         link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" ,integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M", crossorigin="anonymous")
         title #{pageTitle} | #{siteName}
+        link(rel="stylesheet", href="/static/styles.css")
     body
         header
             include ../partials/header
@@ -10,3 +11,4 @@ html
             block content
         footer
             include ../partials/footer
+            script(src="/static/main.js")
