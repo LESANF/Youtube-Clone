@@ -1,0 +1,211 @@
+https://beomy.tistory.com/41 ( 웹팩의 개념 )
+
+웹펙이란 모듈 번들러이다 ( module bundler )
+
+< 모듈 번들러( module bundler ) >
+
+간단하게 이야기 하면, 여러개의 파일을 하나의 파일로 묶어주는 라이브러리를 이야기 한다.
+
+모듈 번들러는 파일의 종속성을 스스로 파악하여, 종속성이 있어 서로 엮여 있는 파일을 하나의 파일로 묶어주는 역할을 합니다.
+
+WEBpack을  사용하는 이유 ?
+
+1. 네트워크 병목현상을 해결 할 수 있다.
+
+HTML에서 <script/>로 자바스크립트 파일을 실행할 수 있다. 그러나 너무 많은 자바스크립트 파일을 로드할 경우,
+
+네트워크의 병목현상이 발생하게 된다. 이러한 문제를 해결하기 위해 하나의 큰 자바스크립트 파일을 로드하면 되지만,
+
+하나의 자바스크립트 파일로 개발할 경우, 가독성과 유지보수 효율이 떨어지게 된다. WEBpack과 같은 모듈 번들러는 
+
+여러 파일을 하나의 파일로 묶어주기 때문에, 네트워크 병목현상을 최소화 할 수 있다.
+
+2. 모듈 단위로 개발이 가능하다.
+
+모듈 번들러를 사용하면 모듈 단위의 코딩이 가능하다. 
+
+★모듈 단위 코딩은 가독성과 유지보수 효율을 높인다.
+
+모듈 단위로 기능을 구분하여 코딩이 가능하기 때문에 코드의 가독성이나, 유지보수 하는데 효율이 증가하게 된다.
+
+★스코프에 신경 쓰지 않고 개발이 가능하다.
+
+var num = 1; 이라는 똑같은 코드를가진 2개의 스크립트 파일이 있다고 가정하자 (code_1.js / code_2.js)
+
+두 JS파일을 HTML에 <script/>로 로드를 한다면 num 변수가 동일한 스코프에 선언되어 충돌이 발생하게 된다.
+*scope = 범위
+
+복잡한 프로젝트의 경우에는 예상하지 못한 작동을 하게 될 수 있다. 모듈 번들러를 사용하게 되면 모듈 번들러는 IIFE(즉시실행함수)로
+
+모듈을 변경해 주기 때문에, 스코프에 신경 쓰지 않고 개발을 할 수 있게 된다.
+
+★라이브러리 종속 순서를 신경 안써도 된다.
+
+★코드를 압축/최적화 할 수 있다.
+
+모듈 번들러를 사용하면, 여러개의 파일을 하나의 파일로 묶어 주며, 파일의 크기를 줄여 페이지 로딩을 빠르게 한다. 
+
+모듈 번들러는 여러개의 파일들을 묶어 하나의 파일로 만들어 줄 때, 종속성을 알아서 확인하기때문에 사용하지 않은 파일은 포함하지 않고
+
+하나의 파일로 만들어 준다. WEBpack의 mode config에 따라 혹은 설정한 플러그인, 코드에 따라 압축/최적화를 선택할 수 있다.
+
+★ES6버전 이상의 스크립트를 사용할 수 있다.
+
+Babel은 ES6 이상의 자바스크립트 문법을 ES5 버전의  자바스크립트 문법으로 변환시켜주는 트랜스 파일러다.
+
+WEBpack는 (babel-loader)를 통해 Babel이라는 튼래스파일러를 이용하여 ES6 이상의 자바스크립트를 ES5로 만들 수 있다.
+
+webpack과 babel을 사용하여, 오래된 버전의 브라우저에서도 ES6 버전 이상의 자바스크립트 문법 사용이 가능해진다.
+
+★LESS, SCSS를 사용할 수 있다. 
+
+babel-loader와 동일하게 webpack은 style-loader와 css-loader라는 로더를 사용하여 LESS, SCSS를 사용할 수 있게 한다.
+
+3. WEBpack 컨셉
+
+Entry, Output, Loader, plugins, mode를 이해해보자.
+
+1) Entry
+
+종속성 그래프의 시작점을 Entry라고 한다. webpack은 config파일을 통해 여러 설정을 할 수 있다.
+
+entry역시 config 파일에 파일 위치를 설정할 수 있으며, 여러개의 entry를 지정하는 것도 가능하다.
+
+config파일에 entry가 설정 되어 있지 않다면 기본값은 ./src/index.js 이다.
+
+----------------CODE----------------
+< webpack.config.js >
+module.export = {
+  entry: './path/to/my/entry/file.js'
+  /* 여러개의 entry 선언이 가능.
+  entry: {
+    index: './path/to/my/entry/index.js',
+    file: './path/to/my/entry/file.js'
+  } */
+}
+
+webpack.config.js는 entry를 ./path/to/my/entry/file.js로 설정한 코드.
+
+2) Output
+
+output 설정으로 생성한 번들을 저장할 위치를 지정할 수 있다. config 파일에 output이 설정되어 있지 않다면 기본 값은
+
+./dist/main.js 임. 생성된 번들 파일들이 ./dist 디렉토리 밑으로 들어가게 된다.
+
+----------------CODE----------------
+const path = require('path');
+
+module.exports = {
+  entry: './path/to/my/entry/file.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'my-first-webpack.bundle.js'
+  }
+  /* 여러개의 entry가 정의 되었을 때, 아래와 같이 설정이 필요합니다.
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js'
+  } */  
+};
+
+output.path : 번들된 파일을 내보낼 디렉토리 위치를 지정해 줍니다. 
+output.filename : 번들된 파일 이름을 지정해 줍니다.
+
+3) Loader
+
+webpack은 모든 파일을 모듈로 관리한다. 하지만 webpack은 자바스크립트 파일만 읽어 올 수 있기 때문에, 스타일시트나
+
+이미지등을 webpack이 읽을 수 있는 자바스크립트로 변경되야 한다. webpack이 이해 할 수 있는 모듈로 변경해 주는 역할을 Loader가 한다.
+
+----------------CODE----------------
+const path = require('path');
+
+module.exports = {
+  output: {
+    filename: 'my-first-webpack.bundle.js'
+  },
+  module: {
+    rules: [
+      { test: /\.txt$/, use: 'raw-loader' }
+    ]
+  }
+};
+
+test : 변환 할 파일을 지정합니다.
+use : 변환 할 파일에 지정할 로더를 설정합니다.
+
+4) Plugins
+
+Loader은 모듈을 처리하지만, Plugin은 번들된 파일을 처리한다. Plugin은 번들된 파일을 난독화 하거나, 압축하는데 사용
+
+난독화 : 코드 난독화는 프로그래밍 언어로 작성된 코드에 대해 읽기 어렵게 만드는 작업이다. 대표적인 사용 예로는 프로그램에서 사용된 아이디어나 알고리즘 등을 숨기는 것 등이 있다. 코드 난독화 과정을 거친 코드를 특정 기준에 의해 심사하는 대회도 있다.
+
+----------------CODE----------------
+const HtmlWebpackPlugin = require('html-webpack-plugin'); //installed via npm
+const webpack = require('webpack'); //to access built-in plugins
+
+module.exports = {
+  module: {
+    rules: [
+      { test: /\.txt$/, use: 'raw-loader' }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({template: './src/index.html'})
+  ]
+};
+
+plugin을 사용하기 위해서는 require을  사용하여 plugins에 추가할 plugin을 가져와야 한다.
+
+또한 new로 사용할 plugin의 인스턴스를 생성하여 plugins에 추가해 준다. 위의 예제 코드에서 사용한 HtmlWebpackPlugin은
+
+생성된 번들 파일을 자동으로 로드( <script/>로 )한 HTML파일을 생성해 주는 plugin이다.
+
+plugin 종류 : https://webpack.js.org/plugins/
+
+5) Mode
+
+mode는 production, development, none 3가지 옵션이 존재.
+
+----------------CODE----------------[production]
+module.exports = {
+  mode: 'production'
+};
+
+mode의 기본값은 production이다. 설정마다 내장된 최적화 옵션을 자동으로 설정하여 줌.
+
+----------------CODE----------------[development]
+// webpack.development.config.js
+module.exports = {
+  devtool: 'eval',
+  plugins: [
+    new webpack.NamedModulesPlugin(),
+    new webpack.NamedChunksPlugin(),
+    new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("development") }),
+  ]
+}
+
+mode를 development로 설정했을 때, 설정되는 옵션은 위의 코드와 같다.
+
+----------------CODE----------------[production]
+// webpack.production.config.js
+module.exports = {
+  plugins: [
+    new UglifyJsPlugin(/* ... */),
+    new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }),
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.NoEmitOnErrorsPlugin()
+  ]
+}
+
+mode를 production로 설정했을 때, 설정되는 옵션은 위의 코드와 같다.
+
+
+----------------CODE----------------[none]
+// webpack.custom.config.js
+module.exports = {
+  plugins: [
+  ]
+}
+
+mode를 none로 설정했을 때는 어떠한 옵션도 설정되지 않는다.

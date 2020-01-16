@@ -1,0 +1,85 @@
+npm install webpack webpack-cli 로 설치
+
+webpack은 파일에서 webpack을 사용하기 위함이고, cli는 터미널에서 webpack을 쓸 수 있게 해주는 것
+
+설치하고 webpack.config.js 파일 생성
+
+그 후, package.json으로 이동. scripts로 가서 "start"를 수정하자 -> "dev:server"로
+
+그리고 아래 라인에 "dev:assets": "webpack" 추가.
+
+이제 실행시킬 때 npm start 안쓸거임. npm run dev:server, npm run dev:assets를 서로 다른 터미널에서 각각 실행시켜야함.
+
+누군가 dev:assets 라고 치면 webpack을 불러오도록 할 것.
+-> "dev:assets": "webpack"
+
+그러면 webpack은 자동적으로, webpack.config.js 파일을 찾으려고 할 것이다.
+
+그러니 파일이름을 바꾸면 안된다. 
+
+기본적인 규칙은, webpack은 exported configuration object를 찾는다는 거다.
+
+config 파일 안에서 명심해야 될 건, server 코드와는 연관시키지 않는다는 점이다. 이건 100% 완전히 client code다.
+-> *client code = html/css/img/js 등등 
+
+우리가 앞에서 예쁜 코드를 작성할 수 있또록 넣어둔 babel-node는, 아직 쓸 수가 없다.
+
+그래서, 우선 webpack.config.js 안에선 옛날 자바스크립트를 쓰자 
+
+const config = {} 객체 선언해두고 export하자. 여기선 export default 문법을 쓸 수 없으니, module.exports = config; 다음과 같이 씀.
+
+webpack은 두가지를 들고있다. 1. entry  / 2. output
+
+enrty = 파일들이 어디에서 왔는가 ?  / output = 그걸 어디에 넣을 것인가 ?
+
+우리는 실습에 앞서, 일단 assets라는 폴더 생성. assets폴더는 우리가 작업할 공간이다.
+
+그리고 또 그 안에 2개의 폴더를 만들거임 js폴더 / scss폴더
+
+js폴더 안에는 main.js 파일생성 / scss폴더 안에는 styles.scss 파일 생성
+
+main.js안에서 최신 자바스크립트 문법을 써서 import를 해준다.
+-> import "../scss/styles.scss";
+
+styles.scss에는 body{ background-color: red; } 이런식으로 테스트 할겸 적어둠.
+
+다시 webpack.config 파일로 돌아와 두 개의 const를 만든다 ENTRY_FILE, OUTPUT_DIR
+
+Node.js에는 파일과 디렉토리 (경로)를 absolute로 만들어주는 방법이 있다. 컴퓨터나 서버에서의 전체 경로를 갖게 되는 것.
+->ex) /users/nicolas/documnets/wetube/assets 이런식으로 단순 예를 든거임
+
+이렇게 전체 경로를 나타내는건데 path라는걸로 할 수 있다.
+-> const path = require("path");
+
+이건 구식버전임 지금 webpack안에선 구식버전으로 써야함 신식이면 import path from "path"; 이런식으로 쓰여짐
+
+이제 방금 선언한 엔트리, 아웃풋 const에 파일을 가져오기 위해 path를 사용할 거임.
+
+const ENTRY_FILE = path.resolve(__dirname, "assets", "js", "main.js");
+->해설
+__dirname은 현재의 프로젝트 디렉토리 이름인데, 이건 어디에서든 접근 가능한 Node.js 전역 변수다.
+
+entry파일의 경로를 쭉 쓰면 "assets", "js", "main.js"이다. assets폴더안 js폴더안 main.js파일.
+
+그리고 이젠 아웃풋
+
+const OUTPUT_DIR = path.join(__dirname, "static");
+->해설
+아웃풋은 디렉토리니까 join을쓰고 똑같이 __dirname그리고 "static"이라는 폴더로 보내라(export)고 할거다.
+
+앞서 선언해둔 config객체를 채워보자 entry: ENTRY_FILE, output: OUTPUT_DIR.
+
+이게 웹팩이다.
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,353 @@
+npm install webpack webpack-cli 로 설치
+
+webpack은 파일에서 webpack을 사용하기 위함이고, cli는 터미널에서 webpack을 쓸 수 있게 해주는 것
+
+설치하고 webpack.config.js 파일 생성
+
+그 후, package.json으로 이동. scripts로 가서 "start"를 수정하자 -> "dev:server"로
+
+그리고 아래 라인에 "dev:assets": "webpack" 추가.
+
+이제 실행시킬 때 npm start 안쓸거임. npm run dev:server, npm run dev:assets를 서로 다른 터미널에서 각각 실행시켜야함.
+
+누군가 dev:assets 라고 치면 webpack을 불러오도록 할 것.
+-> "dev:assets": "webpack"
+
+그러면 webpack은 자동적으로, webpack.config.js 파일을 찾으려고 할 것이다.
+
+그러니 파일이름을 바꾸면 안된다. 
+
+기본적인 규칙은, webpack은 exported configuration object를 찾는다는 거다.
+
+config 파일 안에서 명심해야 될 건, server 코드와는 연관시키지 않는다는 점이다. 이건 100% 완전히 client code다.
+-> *client code = html/css/img/js 등등 
+
+우리가 앞에서 예쁜 코드를 작성할 수 있또록 넣어둔 babel-node는, 아직 쓸 수가 없다.
+
+그래서, 우선 webpack.config.js 안에선 옛날 자바스크립트를 쓰자 
+
+const config = {} 객체 선언해두고 export하자. 여기선 export default 문법을 쓸 수 없으니, module.exports = config; 다음과 같이 씀.
+
+webpack은 두가지를 들고있다. 1. entry  / 2. output
+
+enrty = 파일들이 어디에서 왔는가 ?  / output = 그걸 어디에 넣을 것인가 ?
+
+우리는 실습에 앞서, 일단 assets라는 폴더 생성. assets폴더는 우리가 작업할 공간이다.
+
+그리고 또 그 안에 2개의 폴더를 만들거임 js폴더 / scss폴더
+
+js폴더 안에는 main.js 파일생성 / scss폴더 안에는 styles.scss 파일 생성
+
+main.js안에서 최신 자바스크립트 문법을 써서 import를 해준다.
+-> import "../scss/styles.scss";
+
+styles.scss에는 body{ background-color: red; } 이런식으로 테스트 할겸 적어둠.
+
+다시 webpack.config 파일로 돌아와 두 개의 const를 만든다 ENTRY_FILE, OUTPUT_DIR
+
+Node.js에는 파일과 디렉토리 (경로)를 absolute로 만들어주는 방법이 있다. 컴퓨터나 서버에서의 전체 경로를 갖게 되는 것.
+->ex) /users/nicolas/documnets/wetube/assets 이런식으로 단순 예를 든거임
+
+이렇게 전체 경로를 나타내는건데 path라는걸로 할 수 있다.
+-> const path = require("path");
+
+이건 구식버전임 지금 webpack안에선 구식버전으로 써야함 신식이면 import path from "path"; 이런식으로 쓰여짐
+
+이제 방금 선언한 엔트리, 아웃풋 const에 파일을 가져오기 위해 path를 사용할 거임.
+
+const ENTRY_FILE = path.resolve(__dirname, "assets", "js", "main.js");
+->해설
+__dirname은 현재의 프로젝트 디렉토리 이름인데, 이건 어디에서든 접근 가능한 Node.js 전역 변수다.
+
+entry파일의 경로를 쭉 쓰면 "assets", "js", "main.js"이다. assets폴더안 js폴더안 main.js파일.
+
+그리고 이젠 아웃풋
+
+const OUTPUT_DIR = path.join(__dirname, "static");
+->해설
+아웃풋은 디렉토리니까 join을쓰고 똑같이 __dirname그리고 "static"이라는 폴더로 보내라(export)고 할거다.
+
+앞서 선언해둔 config객체를 채워보자 entry: ENTRY_FILE, 아웃풋은 객체형태로 해야함 
+
+output: {
+ path: OUTPUT_DIR,
+ filename: "[name].js"
+} 
+
+로 적어줌. 이게 웹팩이다. run dev:assets로 실행을하면 안될거임 아직 loader나 mode를 정하지않아서 
+
+webpack이 파일 형식을 이해하지 못함. 앞으로  사용할 모든 파일형식들을 webpack에게 알려줘야함 
+
+==============================#4.0 END=====================================
+
+****** WINDOWS  WEBPACK_ENV에러 해결 방법 ******
+
+1. npm install cross-env
+
+2. "dev:assets": "cross-env 를 추가하고 WEBPACK ~~~" 으로 적어주면 실행됨.
+
+*****************************************************************************
+
+계속 이어서 설정하기에 앞서, .env파일을 가보면 MONGO_URL="mongodb://localhost~~~~", PORT=4000 이런식으로 환경을 만들어줬다
+
+그리고 만든 환경을 실제 코드에서 process.env.MONGO_URL 이런식으로 사용했고, 이걸 수동으로 직접 설정해주는 방법이 있다.
+
+package.json으로 와서 "dev:assets": "WEBPACK_ENV=development webpack"로 수정. mode를 development로 잡아줘야하기 때문.
+
+그리고 바로 아래 라인에 "build:assets": "WEBPACK_ENV=production webpack" 추가.
+
+build:assets는 내 코드를 server에 올려줄것이고, 여기서 환경은 production으로 한다. 
+
+그리고 다시 config파일로 돌아와서 그 ENV를 받도록 한다.
+-> const MODE = process.env.WEBPACK_ENV;
+
+앞에서 썻던 이름을 config와서도 똑같이써야함 WEBPACK_ENV
+
+그리고 config객체에 mode: MODE로 넣어줌. 웹팩을 실행해보면 mode를 설정하라는 에러문은 뜨지않을거다.
+
+그리고 우린 webpack에게 규칙(rules)를 추가해줄 것이다. webpack이 module을 만났을 때를 설정해야함. 
+
+module: { 
+ rules: []
+}
+
+모듈이라는 객체를 생성하고 안에 rules규칙으로 배열( [ ] )로 선언함. 규칙은 하나의 배열(array)임.
+
+rules에서 설정할것은, webpack이 scss인 파일 확장자를 만날때마다 어떤 loader를 실행해라 라고 정해줄거다.
+
+loader는 기본적으로 webpack에게 파일을 처리하는 방법을 알려주는 역할임. webpack은 아무것도 할 줄 모른다
+
+loader를 추가해줘야, 비로소 파일 다르는 법을 알게되는 것이다. rules를 추가 하는데
+
+test: /\.(scss)$/ 다음과 같이 {}에 넣어주자. 뜻은. 파일이 scss파일인지 알아보라고 확인하는 것 익숙하겠지만 저런식을 정규식(regular expression) 이라한다.
+
+그다음으로, 해줄것은 scss파일을 찾았을 경우에, 많은 것을 할 수 있지만 우리가 해야할 것은
+
+가장 먼저 그 scss를 css로 바꾸고 그 css에 해당하는 텍스트 전체를 추출해서 css파일로 저장해야 하는 것이다.
+
+요약하자면 
+
+처음에는, 확장자가 SCSS인 파일을 찾고, SCSS를 CSS로 바꾸고, 전체 텍스트 중에 그 CSS의 텍스트를 추출하고,
+
+그 추출된 CSS를 분리된 하나의 파일로 만드는 것이다.
+
+우리가 SCSS파일들을 찾았을때 뭔가를 하려고 할 것이다. 그명령어는 use.
+
+사용할것을 설치해보자 npm install extract-text-webpack-plugin 여기에 조건을 붙일 거임.
+
+npm에서 새로운 버전을 설치하고 싶다면 @기호를 쓰면됨. @을 쓰면 구체적인 버젼을 설치할 수 있다. ex) @2.3 = 버젼2.3
+
+우리는 @next를 붙여서 설치 npm install extract-text-webpack-plugin@next
+-> 베타버전으로 설치되었으면 잘된거다. 우리는 @next를 써서 베타버전(최신버전)을 깔 수 있다.
+
+이제 use명령어로 방금 설치한 plugin을 사용 (use) 할 수 있음.
+
+그전에 다운했으면 webpack.config.js파일에 포함(import) 시켜야 됨.
+-> const ExtractCSS = require("extract-text-webpack-plugin");
+
+이제 우리는 webpack에게 CSS를 가지고 뭘 어떻게 할지 알려 줄 수 있다.
+
+use: ExtractCSS.extract([]) 한다 extract()에 배열형으로 loader를 계속 넣을 수 있음. *extract = 추출물 
+
+extract()의 안에는 CSS의 텍스트를 어떻게 추출하는지 적어줘야 하는데, 문제가있다.
+
+문제는 SCSS파일을 CSS로 바꾸는게 선행되어야 하나. 순서가 중요하니 기억해야 함.
+
+나에게 Sass파일이 있고, 그 Sass파일을 가져와서 CSS파일로 바꾸고, 그 CSS에서 webpack에게 CSS를 어떻게 다루는지 알려주면
+
+그제서야 추출할 수 있는 것이다.
+
+그리고 하나더 주의해야할 점은 webpack에선, (loader를 사용할 때) 끝에서 부터 시작해서 처음으로 진행한다.
+
+먼저 extract할거 쓰고, 다음엔 CSS파일을 이해시키는 부분, 그 다음에 Sass파일 다루는 부분을 적는다.
+
+webpack이 이걸 실행하면 ( 작성할 때와는 반대 순서로 ) 먼저 SCSS 파일 다루는 것부터 하고, 다음엔 CSS 파일 다루는 걸 하고,
+
+그런 다음 추출을 진행하는 흐름이다. 이제 loader를 써보자
+
+ use: ExtractCSS.extract([
+          {
+            loader: "css-loader"
+          },
+          {
+            loader: "postcss-loader"
+          },
+          {
+            loader: "sass-loader"
+          }
+        ])
+
+
+다음과 같이 loader를 추가함. css-loader는 webpack이 CSS를 이해할 수 있도록 가르쳐주는 것.
+
+문제가 있다. 우리가 Sass에서 출발해서, 우리의 코드가 호환이 되도록 만들고 싶은것이다. 
+
+코드를 그냥 번역만 할 게 아니라, 호환성을 부여하고 싶은 것이다. 그게 postcss-laoder
+
+==============================#4.1 END=====================================
+
+일단 entry, output을 지정해주엇고 그건 그걸로 된거다.
+
+module: {~~ 부분이 의미하는건, module을 발견할 때마다, 지정해둔 rules: [~~를 따르라고 하고있고
+
+거기서 먼저, 어떤 조건(condition)을 알아보라(test)고 할 거다. test를 살펴보자
+
+test: /\.(scss)$/ = SCC로 끝나는 어떤 module (이경우엔 styles.css 파일)을 만나게 되면, 이 plugin(ExtractCSS.extract)을 쓰라함 
+
+그리고 이 plugin(ExtractCSS.extract)은 내부에서 또 plugin을 사용하고 있다. 왜냐하면 SCSS파일을 일반적인 CSS로 통역해야 되기때문.
+
+그걸 위해서, 먼저 sass-loader를 이용함.
+
+sass-loader는 Sass, 혹은 SCSS를 받아서 일반 CSS로 바꿔줄 수 있다.
+
+그런 다음, 우린 postcss-loader를 쓸 건데, 이건 CSS를 받아서, 우리가 얘한테 주는 plugin을 가지고 CSS를 변환해줄것이다.
+
+예를 들어, 우리 CSS를 예로, 여기서 postcss-loader를 쓰려고 하는데, 이걸 인터넷 익스플로러와 호환되게 만들자 라고 할 수 있다.
+-> 그럼 postcss-loader가 다알아서해줌 잡다한것 까지.
+
+이제 CSS 호환성 관련된 걸 해결한 뒤, css-loader를 이용하면 webpack이 CSS를 이해할 수 있게 되는거다.
+
+잘 호환되는 순수한 CSS가 불러와지면, 우린 딱 그 부분만 텍스트를 추출해서, 어딘가로 보낼 거다. (아직 어딘가로 보낼지 안정함)
+
+loader를 설치하자 npm install css-loader postcss-loader sass-loader
+
+postcss부터 보자. ( https://postcss.org/  해당싸이트임 ), PostCSS를 쓰면 많은 도구들을 사용할 수 있다.
+
+PostCSS를 통해서 Autoprefixer라는 걸 사용하면, :fullscreen {}  이런 식을
+
+이 속성(property)은 webkit을 쓰는 브라우저에서 지원하지 않으니까 아래와같이 추가시킴.
+
+:-webkit-:full-screen {
+}
+:-moz-:full-screen {
+}
+:full-screen {
+}
+
+다음과같이 추가해서 수정해준다.  // moz는 파이어폭스 webkit은 크롬이나 사파리
+
+난 하나만 적었을뿐인데 Autoprefixer를 통해 webkit, moz가 추가된 결과물로 나온다는거임. 등등 여러 다양한 플러그인을 쓸 수 있다.
+
+우리의 경우에는 Autoprefixer를 사용할거다.
+
+설치는 npm install autoprefixer 로 설치, 이제 우리는 여기서 postcss-loader를 적용할 건데, 넣어줘야되는 options이 있다.
+
+loader: "css-loader", options: { plugins() {return [ autoprefixer( ) ];}
+
+options으로 plugins라고 적고 이 plugins는 함수(function)가 될 것이다 plugins() {} 그리고 이함수가 안에서 return 하는건
+
+plugin들로 구성된 array들임. 우리의 경우엔 plugin이 하나만 있음. 그전에 사용하기위해 import부터 하자
+-> const autoprefixer = require("autoprefixer");
+
+우리는 지금 하나의 plugin으로만 이루어진 array를 ruturn 해주고 있고 원하는 만큼 많은 plugin들을 추가해줄 수 있다.
+
+배열식이니 return [autoprefixer(), blabla(), blabla2()] 이런식으로... 지금은 하나뿐이니 return [autoprefixer()]
+
+그리고 또 autoprefixer()의 안에 autoprefixer의 option을 넣어주자. 
+
+autoprefixer가 가지고있는 옵션중 browserslist가 있는데 이것은 코드 유지보수를 위해 사용할 수 있다.
+
+return [autoprefixer({ browsers: "cover 99.5%" })]; 
+
+이옵션의 의미는 내 코드를  시중에 있는 브라우저의 99.5%와 호환데게 해준다는 뜻.
+
+그리고 우리는 plugin을 import해줬으니 설치해주자. output객체 다음으로 넣으면됨
+->  plugins: [new ExtractCSS("styles.css")]
+
+플러그인을 여러개 넣을것을 대비하여 [] 배열식으로 만듬, 그리고 new plugin이름=ExtractCSS(저장할 파일의 이름)
+
+npm install node-sass도 해주자
+
+이제 셋팅을 다했고 webpack을 실행해봄. npm ren dev:assets
+
+성공 됐으면 static폴더가 생길것이고 안에는 main.js파일과 styles.css파일이 생겼다. styles.css내용은 styles.scss내용과 같음.
+
+성공이 됐으니 조금더 진화시켜봄 scss폴더에 config폴더 생성 폴더안에는 _variables.scss 파일생성.
+
+_variables.scss파일에 $bgColor : red; 로 선언 
+
+그리고 styles.scss에서 _variables.scss를 import함 
+-> @import "config/_variables.scss";
+
+* styles.scss파일과 config는 같인 디렉토리위치. _variables.scss는 config의 안. 
+* styles.scss에서 _variables.scss를 import하려면 _variables.scss를 찾아야된다 현재위치에서 config로 들어가면 해당파일이 있음
+* 그래서 다음과같이 import경로를 잡으면됨 
+
+import하고 background-color : red를 background-color : $bgColor 로 바꿔서 쓸 수 있다 
+
+config의 뜻은 컴퓨터에서 환경을 설정하다는 뜻임. 
+
+==============================#4.2 END=====================================
+
+rules에 다음과같은 규칙을 추가
+
+{
+  test: /\.(js)$/,
+  use: [
+        {
+          loader: "babel-loader"
+        }
+        ]
+}
+
+그리고 npm install babel-loader
+
+package.json으로와서 dev:assets의 마지막에 -w 추가. 이것은 css 파일을 수정할 때마다 webpack을 껏다, 켰다 하기 귀찮기 때문
+
+-w해놓으면 파일들을 계속 지켜보겠다는 뜻임. 만약 변화가 생기면 webpack을 다시 실행 시켜 주는것임.
+
+그리고 이제 webpack과 view(템플릿)을 연결시키자 main.pug의 head부분에 link(rel="stylesheet", href="/static/styles.css") 추가.
+
+footer에는 script(src="/static/main.js") 추가.
+
+서버에도 이과같은 점을 알려줘야함. app.js로 이동하여 예전에 upload처리할 때와 같은 걸 해줌.
+-> app.use("/static", express.static("static"));
+
+이부분은 main.pug에서 script(src="/static/main.js")를 부르기때문에 app.js에선 이부분에 반응하는 것이다.
+
+/static이라는 route는 존재하기 않기 때문에, 추가해준 것이다. 위와같은 코드의 의미는 
+
+누군가 /static으로 가려고 하면, 난 static 폴더로 가보라고 하는 것이다.
+
+서버와 웹팩을 켰고 정상적으로 연결됐으면 배경색은 빨강색이 되었을거임. f12를 눌러 console을 보면 
+
+regenetatorRuntime이 정의 되지 않았다는 에러가 뜬다. 그 이유는 크롬이 assets/js/main.js에 있는 async를 어떻게 처리해야 되는지 몰라서 그럼
+
+이런 에러를 고치기위해 polyfill라는걸 설치해야함 우리는 babel-polyfill을 설치할거다.
+
+정의를 내리면 브라우저에 아직 없는 무언가를 보유하고 있는것이다 @babel/polyfill은. 브라우저의 구멍을 메워주는 자바스크립트 파일 같은 것이다.
+
+polyfill은 custom regenerator runtime이라는걸 가지고 있고 이건 아까 우리 ERROR코드와 같다.
+
+npm install @babel/polyfill 설치 
+
+그리고 webpack에 결합(combine)시키는 것으로 설정할거다. 기존 entry를 ["@babel/polyfill", ENTRY_FILE] 다음과같이 수정.
+
+우리는 webpack의 설정을 바꿔줬기 때문에 npm run dev:assets를 다시 실행시켜야함. 
+
+그리고 static폴더는 github에 올리기 싫으니 .gitignore에 static 추가.
+
+==============================#4.3 END=====================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
