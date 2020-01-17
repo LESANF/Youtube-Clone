@@ -1,0 +1,61 @@
+css 강의가 아니기때문에 디자인 부분은 빠르게하려고 한다.
+
+_variables.scss 에 준비된 색상 정의.
+
+$red: #ea232c;
+$dark-red: #bb2f2a;
+$grey: #f5f5f5;
+$black: #444444;
+$dark-grey: #e7e7e7;
+
+그리고 config폴더안 reset.scss 생성 내용은 reset.css 구글링 후 나오는내용. 브라우저의 기본값들을 초기화해서 0으로 만들어줌
+
+그리고 styles.scss와 같은 위치에 main.scss를 생성
+
+main에는 폰트, 몇가지 색상등등... 알아둬야 하는 것은 이 main에서 (layouts 폴더에있는 main.pug를 보자)
+
+min-height를 지정해놨다 (최소 높이).
+
+왜냐하면 여기 footer가 있는데, 가끔 페이지가 너무 줄어들어서 아래까지 차지하지 않고 footer 페이지 중간 쯤에 위치하는 경우를 방지하기위해
+
+그리고 styles.scss에서 reset, _varialbes, main을 모두 import 
+
+variables에 왜 _(언더바)가 붙은 이유는 언더바를(underscore or low-dash라고도함) 오로지 sass파일에만 붙이려고 했기 때문.
+
+Sass 파일만 앞에 _를 붙였고, 실제 사용자들은 사용하지 않을 거다. reset, main은 사용자들이 사용할거고 
+
+Sass 파일에서 변수를 선언할 때는 $ 기호를 붙이면 된다.
+
+scss폴더에 partials폴더를 만듬. 그리고 header.scss생성 그리고 pages라는 폴더도 하나더만듦 그안에는 home.scss를 생성.
+
+사용해야하니 styles.scss에서 partias을 먼저 가져오고, 그 다음에 pages를 가져오자.
+
+header부분부터 스타일링시작.
+
+https://github.com/nomadcoders/wetube/commit/1a54cfec4e138bfd703898977e3e0614215e4cbd 
+
+헤더끝
+
+Sass에 대해서 몇 가지 알아야할 게 있는데, header.scss의 장점이다.
+
+selector를 부모요소 안에다 둘 수 있다. form { ~~ { input} } 이런식으로 input이 form안에 있음.
+
+그리고 예전에는 .header__column:last-child를 따로 써야 했던 것을,  &:nth-child()이런식으로 .header__column{ 안에 쓸 수 있음.
+
+footer, Login Join 부분
+
+https://github.com/nomadcoders/wetube/commit/92f0912aa257b3f0c2b5b64dfebc02753bb5b56d
+
+그리고 내가 저장할때마다 nodemon은 다시 서버를 재시작시킴 그걸 막기위해 dev:server마지막에 --ingnore 'scss' 추가.
+
+이제 videoDeatil과 home화면.
+
+https://github.com/nomadcoders/wetube/commit/17d71476d86c1c6c8449ddf0472ba53c0420061e
+
+
+
+
+
+
+
+
