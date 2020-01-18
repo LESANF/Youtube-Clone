@@ -54,4 +54,101 @@ models에 User.js를 만들자 이제 user object를 만들게 되는것이지.
 
 =============================#6.0 END==========================
 
+User에 model을 만들자. 
+
+먼저 import mongoose를 해줌. 그리고 UserSchema 생성.
+
+이름, 이메일, 소셜계정을 위한 ID( 예를들어, 누군가 깃헙 계정으로 로그인하면, 그의 깃헙 ID를 저장하려는것 )
+
+그래서 나중에는 이 모든 것을 하나의 사용자로 묶어줄 수 있게 된다.
+
+내가 이메일을 써서 로그인하려고 하는데, 알고보니 이미 깃헙 계정으로도 가입했다는 것이 확인되면, 로그인 하는사람에게 알려줄 수 있지
+
+넌 지금 이메일로 로그인하려고 하는데 넌 이미 깃헙으로 가입이 되어있다고. (중복방지)
+
+계정은 깃헙이나, 페이스북 같은 다른 서비스를 통해서 가입할 수 도 있다. 그리고 이렇게 만든 계정들에는 패스워드가 없을 거다.
+
+만약 사용자 정보에 이메일도 저장하고, 또 소셜 계정도 저장한다면, 너는 사용자 인건 맞는데 소셜서비스를 통해서 로그인 할 수 있을거야
+
+이메일이 아니라. 라고 알려줄 수 있다. 사람들은 이메일로 가입한지 소셜을통해 가입을 했는지 잊어버리기 때문.
+
+그리고 어떤 사람이 이메일을 입력했는데 이 이메일을 가진 깃헙 아이디가 있다는게 확인되면, 니 계정에는 패스워드가 없다.
+
+패스워드를 만들어서, 소셜계정을 이용하거나, 또는 이메일을 이용해서도 로그인 할 수 있을거라고 알려 줄 수 있음.
+
+그리고 AvatarUrl도 추가. 이건 우리가 만든 fileUrl과 똑같이 동작할거임. 같은 방식으로 URL을 얻을거임
+
+서버로부터의 URL일 수도있다. -> 사용자가 서버에 업로드하도록 한다면.
+
+아니면 깃헙으로부터의 URL이 될 수도있음. 깃헙이나 페이스북 프로필 사진이.
+
+그리고 우리의 경우엔 facebookId, githubId로 스키마를짬.
+
+최종적으로 아래의 코드와 같이 스키마를 짬.
+
+  name: String,
+  email: String,
+  avatarUrl: String,
+  facebookId: Number,
+  githubId: Number
+
+만들어진 스키마로 model을 생성하고 export까지하자..
+
+const model = mongoose.Model("User", UserSchema);
+
+export default model;
+
+그리고 만들어진건 init에 import시켜서 사용하자.
+
+아직 User.js에는 passport의 개입이 이뤄지지않음. 왜냐면 그전에 우린 passport-local-mongoose를 먼저 쓸거니까.
+
+npm i passport-local-mongoose로 설치. 이게 결국 패스워드 설정, 패스워드 확인 등등 그런 것들을 자동으로 해주는 것이다.
+
+설치를 했으니 import ! import할때 import다음의 텍스트는 중요한게아님 아무거나 해도됨 from다음의 "passport-local-mongoose"는 바꾸면 안됨
+
+그리고 plugin해주자. 그리고 passportLocalMongoose는 설정객체가 필요함.
+
+우리가 쓰려고하는 옵션은 usernameField이다. 이것은 username이 될 field명을 명시해주는 기능을 가지고 있음.
+
+우리는 지금 username(사용자이름)과 password(패스워드)를 이용한 인증부터 하려고 하기 때문.
+
+사용자이름은 사용자의이름(Lesa)가 될 수도 있고, 이메일이 될 수도 있다. 어떤 field를 username으로 할 것인지를 알려주자.
+
+이름이나 이메일 모두가능하지만 우리의경우 이메일로하자 그러는 이유는 뭔가를 체크할 필요가 없기 때문이다.
+
+username의 문제점은 누가 그걸 변경하게 되면 맞냐 틀리냐를 확인해야하고 그런 것들이 엄청 번거롭기때문.
+
+우리는 passportLocalMongoose가 있으니까 얘가 모든걸 해줄거임.
+
+UserSchema.plugin(passportLocalMongoose, {usernameField: "email"}); 로 작성. 이렇게 작성하면,
+
+우린 user를 가지고 여러가지 method를 쓸 수 있게 된다. 
+
+여기까지 작성했지만 우린 아직 인증에 관해선 아무것도 한 게 없다. 인증에 관련된 기능을 사용할 방법을 가지고있지만
+
+사용자 인증까지 한건 아니다. 파일을하나더 만들자 바깥에 passport.js 생성.
+
+이 안에 strategy랑 필요한 것들을 넣을 것이고. 일단 passport, passport-loacl을 설치.
+
+passport는 passport그자체고 passport-local은 username과 password를 쓰는 사용자 인증 방식(strategy)를 의미.
+
+지금은 passport-local을 설치할 거고, 이따가 passport-facebook, passport-github 같은 것도 설치해서 쓸거임.
+
+npm i passport passport-loacl 설치. 설치를 했으니 import하자 passport.js에. 그리고 User도 가져오자.
+
+이제 해야할건 passport에게 strategy를 하나 사용해라고 말할거임 strategy는 로그인 방식(페이스북, 깃헙, username&&password로 로그인하기)
+
+지금 이 경우에는 passport-local-mongoose가 제공하는 strategy를 사용하려고 함. ( username && password를 쓰는 strategy )
+-> passport.use(User.createStrategy());
+
+createStrategy() 이걸 쓰는건 굉장한 지름길임 strategy를 쓰면 여러줄의 코드를 써야하는데 이걸 createStrategy()로 해결가능.
+
+=============================#6.1 END==========================
+
+
+
+
+
+
+
 
