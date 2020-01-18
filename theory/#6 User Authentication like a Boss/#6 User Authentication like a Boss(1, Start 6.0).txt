@@ -1,0 +1,57 @@
+https://interconnection.tistory.com/74 ( 쿠키, 세션에 대한 개념 )
+
+이제 인증(authentication) 기능을 위해 Passport를 사용할거다 middleware임.
+
+인증이란 ? 브라우저 상에 쿠키(Cookies)를 설정해주면, 그 쿠키를 통해서 ID 등을 알 수 있을 테고,
+
+Passport가 브라우저에서 자동으로 쿠키를 가져와서 인증이완료된 User object를 controller에 넘겨줄거다.
+
+웬만한 서비스는 거의 다있고, Passport 모듈의 장점은, 다른 모듈들도 지원해준다는 것이다.
+
+Passport를 사용하기전 우리는 쿠키(cookies)에 대해서 이해해야 한다.
+
+쿠키는 우리가 브라우저에 저장할 수 있는 것들인데 inspect(f12) 검사로 들어와 storage->cookies에서 쿠키들을 볼 수 있다.
+
+쿠키는 브라우저에 저장할 수 있는 어떤 것들인데, 모든 요청에 대해서 백엔드로 전송될 정보들이 담겨있다. 이런 일들은 자동적으로 일어난다.
+
+예를들어, 클라이언트(웹브라우저)에 쿠키가 있을 때, 서버에서 뭔가 requset-요청(로그인, 가입, 홈으로가기 등등)할 때마다
+
+브라우저가 자동적으로 쿠키들을 서버로 전송해준다. 다 자동적으로 벌어지는일.
+
+그리고 Passport가 하는 일은 쿠키를 생성하고, 브라우저에 저장시켜주고, 유저에게 해당 쿠키를 준다. 
+
+passport 홈페이지에서 정의한 인증 부분을 보자.
+
+app.post('/login',
+  passport.authenticate('local'),
+  function(req, res) {
+    // If this function gets called, authentication was successful.
+    // `req.user` contains the authenticated user.
+    res.redirect('/users/' + req.user.username);
+  });
+
+통합시키가 쉬운편이다. 코드와 함께 보자.
+
+예를들어 누군가 /login으로 post 시켰을때, passport.authenticate('local')을 호출함.
+
+여기서 'local'은 Stragegy(전략) 이라고 불리는건데, 우리의 경우에는 facebook이나 github를 쓸 수있음.
+
+그리고 인증이되면 function이 실행되고 res.redirect한다. 코드에서 보면 알겠지만 인증이 완료되면 passport 스스로
+
+req.user를 만들어준다. 이게 바로 현재 로그인한 사용자가 될거다.
+
+passport는 우릴 위해 모든 걸 다 처리해준다. 쿠키도 만들어주고, 그 쿠키를 받고, 어느 유저가 어느 쿠키를 가지고 있는지 기억할 것이고
+
+모든걸 다알아서 해주기때문에 우리가 나설필요가 없음.
+
+그리고 모듈을하나보자 Passport-Local Mongoose. 이건 사용자 기능을 추가하는 건데, User model을 위한거다.
+
+우리는 User model을 만들지않음. 이번 파트에서 만들거임. PLM은 기본적인 사용자 인증에 필요한걸 만들어줌
+
+패스워드 변경, 패스워드 확인, 패스워드 생성, 패스워드 암호화등 세상 모든 애플리케이션이 기본적으로 필요하는 것들을.
+
+models에 User.js를 만들자 이제 user object를 만들게 되는것이지.
+
+=============================#6.0 END==========================
+
+
