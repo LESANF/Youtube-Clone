@@ -219,8 +219,86 @@ users에 _id : ObjectId, name, email, salt, hash등이있는데 그중 salt, has
 
 =============================#6.2 END==========================
 
+이제 가입시킬 수 있다, 하지만 로그인을 시키지않았음.
 
- 
+userController로와서 join을 처리하는 postJoin을 middleware로 바꿀거다.
+
+미들웨어는 함수의인자가 req, res, next이고 이 controller를 다른 controller로 보내는거기때문에 next()도 시켜야함. 안하면 무한로딩
+
+가입하고 바로 로그인으로 넘기는거임 위에설명한 2번째 방법으로 자동으로 로그인하는거다 try끝 부분에 next()넣어주자.
+
+그리고 이제 res.redirect(route.home)은 사용하지않을거임 에러났을때 res.redirect(routes.home)으로 넣어주자 catch안에.
+
+일단 지금까지한건 사용자가 가입은 되어있음. register로 가입하고 DB까지 올라가있음.
+
+이제 로그인해주는 컨트롤러를 만들자. 이건 새롭게 만드는게아니라 postLogin을 수정해주면됨 postLogin은 결국 passport의 함수가 될거기때문.
+
+그리고 passport는 지금 username과 password를 찾도록 설정되어있기때문. 그것들은 postJoin에 이미있음 name, password로
+
+next다음 postLogin이 오게하면되니까 globalRouter로가서 postJoin을 미들웨어위치로주고 다음 postLogin을 추가해주자.
+
+join 화면에서 username과 password를 넣어줬을 때, postJoin에서 가입하고 postLogin에서 로그인 시킨다.
+
+postJoin에서 받은 username(우리는 email)과 password 정보들을 postLogin으로 보내도록 한다. 마치 form을토해 postLogin에게 정보를 주듯이.
+
+우선 passport를 userController에서 쓰기위해 import하자. passport불러오는걸 맨위로하자. 패키지를 가져오고 파일을 가져오는 방향으로.
+
+postLogin을 아래의 코드와 같이 변경.
+
+export const postLogin = passport.authenticate("local", {
+  failureRedirect: routes.login,
+  successRedirect: routes.home
+});
+
+authenticate는 passport에서 제공하는 함수고, "local"은 우리가 쓴 strategey, 뒤에 객체는 authenticate의 옵션들임.
+
+실패하면 다시로그인 해야함으로 login화면으로, 로그인이 성공됐다면 home으로.
+
+기억해야한다 passport.authenticate()는 username(우리는 email), password를 찾아보도록 설정되어있음. (위에 register의 설정임)
+
+미들웨어는 정보를 다음 것으로 넘겨주는 것이고, postJoin은 이메일, 패스워드 등 정보들을 받아 가입시키고, next()가 호출되면서 다음것으로가고
+
+같은 정보를 전달하게 되는데, 다음 것인 postLogin은 사용자를 로그인 시켜주는거임.
+
+테스트하기전에 middlewares.js로가서 res.locals.user에대한것을 수정하자. 
+
+그이유는, passport가 사용자를 로그인 시킬 때, 쿠키나 serialize, deserialize등의 기능을 다 지원해줌은 물론이고, user가 담긴 object를 요청(request)에도 올려줄 거기때문.
+
+이렇게해야 우리 템플릿들이 이 user에 접근 가능하게 할 수 있다.
+
+그리고 app으로가서 해당 passport를 가져오고 사용해야함. 그리고 route들 이전에 초기화와 세션을저장해줘야함.
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+우리는 실행된 cookiePasrser로부터 쿠키가 내려와서 initialize(초기화)되고, 그 다음엔 passport가 스스로 쿠키를 들여다봐서, 그 쿠키 정보에 해당하는 사용자를 찾아줄거다.
+
+그리고 passport는 자기가 찾은 그 사용자를 요청(request)의 object, 즉 req.user로 만들어준다.
+
+그렇게 req.user를 받으면 user object를 템플릿들에게 추가시켜줄 수 있음. 예로 템플릿중 header로가면, user.isAuthenticated부분이 문제없이 작동할 것이다.
+
+여기서 테스트를위해 JOIN으로 접근하면 에러가 뜰건데 그이유는 user가 존재하지않기때문. 만들어놓은게 없어서 req.user가 없음. 그러니 res.locals.user = req.user || {}로 
+
+{} 빈객체를 주자. 그러면 연결됨.
+
+header에 user는 원래 res.locals.user = isAuthnticated : true, id : 999인 객체를 테스트용으로 만들어줬지만 지금은 실제로 passport로인한 register 가입으로인해 만들어지기 때문.
+
+하지만 처음은 user가 없기때문에 이부분에대해 연결자체가 안된다 그걸 방지하기위해 {}로 객체를 만들어두면 에러없이 페이지에 연결됨.
+
+이러고 다시 JOIN form으로 돌아가서 정보를 채우고 가입을하면 또 에러가남 Unknown authentication strategy "local", app.js에 passport.js를 안넘겨줘서그럼 import해주면됨.
+
+정상적으로 가입이 되었기때문에 home으로 가지고 LOGIN을 해보면 성공적으로 home으로 돌아감. 잘못된 정보를 적으면 LOGIN화면으로 돌아가짐.
+
+근데 한가지 문제점이 생겼다 쿠키가 생성이안됨. 우리는 세션을 사용하기에 앞서 express-session을 설치하지 않았기 때문.
+
+express-session은 session을 관리해주기 위해 필요한 거다. 쿠키를 이용하기위해 express-session을 설치하고  셋팅을 해줘야함.
+
+session 데이터는 쿠키 자체에 저장되지 않음 그래서 우린 session이 필요함.
+
+
+
+
+
 
 
 
