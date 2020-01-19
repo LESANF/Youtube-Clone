@@ -145,10 +145,82 @@ createStrategy() 이걸 쓰는건 굉장한 지름길임 strategy를 쓰면 여�
 
 =============================#6.1 END==========================
 
+serializeUser, deserializeUser 를 알아보자.
+
+serializeUser는 기본적으로, 어떤 정보를 쿠키에게 주느냐를 의미한다.
+
+지금 웹브라우저(즉, 클라이언트)에 있는 사용자에 대해서, 어떤 정보를 가질 수 있느냐, ( 쿠키는 사용자 ID가 1이라는 정보 )
+
+쿠키에 있는 정보는 자동적으로 백엔드에 보내지고, 백엔드에서 사용자ID가 1인 사용자가 누구인지 알게 됨.
+
+그런 정보가 쿠키에 저장되는거지.
+
+serialization은 어떤 field가 쿠키에 포함될 것인지 알려주는 역할을 한다. 쿠키에 너무 많은 정보를 주면안됨
+
+쿠키는 아주 작아야하고 민감한 정보는 담으면 안된다. 누군가 그정보에 접근할 위험이 있음.
+
+passport.serializeUser(function(user, done){ done(null, user.id); }); 는 쿠키에 user.id만 담게 되어있다.
+
+오로지 id만 전송하게되고 사용자가 브라우저에서 쿠키를 열어본다면, 쿠키에는 숫자 하나, 즉 id만 보일 거임.
+
+deserializeUser는 어느 사용자인지 어떻게 찾는가이다. 만약 쿠키를 받아봤는데 id가 1라면, 
+
+desirialize는 그 쿠키의 정보를 어떻게 사용자로 전환하는가를 의미한다. 이런 부분을 설명하는 이유는
+
+passport-local-mongoose의 도움으로 지름길을 쓸 것이기 때문이다. serializeUser와 deserializeUser가 이미 제공되고 있기 때문에
+
+따로 우리가 할필요가없다.
+
+passport.serializeUser(User.serializeUser()); 이코드를 passport.js에 입력하자
+
+코드의 의미는 passport에게 쿠키에는 오직 user.id만 담아서 보내도록 해라고 지시하는 것이다.
+
+그리고 deserialize를 바로해주자. passport.deserializeUser(User.deserializeUser()); 를 바로추가. 
+
+이렇게 간편하게 지름길을 이용해서 작성하는 이유는, 전세계 모든 이들이 이렇게 똑같이 함수를 시행하기 때문이다.
+
+일반적으로 사람들은 쿠키에 user.id를 담고, 그다음에 그 id로 사용자를 식별한다 기본적으로.
+
+이렇게 passport가 사용자 인증을 처리할 수 있도록 설정이 되었다.
+
+globalRouter.js로 이동, 우리는 get, postJoin을 만들었었다. postJoin을 수정해보자.
+
+패스워드가 맞는지 체크하는 미들웨어를 하나 넣을거기때문. userController로 가서 postJoin을 수정하자.
+
+else에 우리가 해야할일로 가입, 로그인처리를 해야하는 이부분을 할거임 일단 User model을 가져오자.
+
+passport-local-mongoose를 보면 register를 제공한다. 먼저 계정을 생성하고 이를 가입(register) 시키자.
+
+res하는걸 기다려야하니 비동기식 await를 사용. awiat를 사용한다 ? = async도 필요하다. 둘은 한쌍.
+
+if문으로 우리는 password, password2를 비교 즉 가입할때 비밀번호 체크하는 부분을만듦. 같을경우 else로 회원가입진행.
+
+일단 객체를 생성해야하니 await User({});로 틀을가져오자. User.create()를 사용하면 객체를 생성하고 DB에 올려버리기 때문에. 이미 있는 사용자라고 뜬다. 그래서 진행이안됨.
+
+가입하려면 일단 이름, 이메일이필요 패스워드는 나중에 만들것. 틀을만들었으면 register하자
+
+register는 User object(유저 객체)가 필요. await User.register(user, password); register는 user, password가 필요하고 user는 우리가만든 객체이며 name, email을 가지고있음
+
+그리고 좀더 세련되게 만들기위해 try, catch구문 추가. 서버를 열어서 JOIN을가서 가입을해보자. 
+
+정상적으로 가입이되었다. home으로 redirect했고. mongoDB를 통해 데이터베이스를 들여다봐도 가입이 된걸 확인할 수 있다.
+
+users에 _id : ObjectId, name, email, salt, hash등이있는데 그중 salt, hash는 패스워드를 암호화시켜주는거다. 내가입력한 패스워드는(12345)
+
+그전에 우리는 쿠키를보러가보자. 지금 쿠키는 fontawesome에서 온 쿠키밖에없음. 지금 내가 한일은 사용자를 등록했다.
+
+아직 이사용자를 로그인 시켜주지 않았음. 여기서 두 가지 방법으로 나뉜다.
+
+1. 등록한 다음에 로그인 화면으로 보내서 로그인 하라고 하는 방법.
+
+2. 등록한 다음에 그냥 자동으로 로그인 시켜버리는것 (우리는 이방법으로 할 것)
+
+일단 테스트를 마쳤으니 사용자정보를 삭제하자.
+
+=============================#6.2 END==========================
 
 
-
-
+ 
 
 
 
