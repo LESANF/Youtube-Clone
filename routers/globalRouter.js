@@ -4,9 +4,9 @@ import { home, search } from "../controllers/videoController";
 import {
   getJoin,
   postJoin,
+  logout,
   getLogin,
-  postLogin,
-  logout
+  postLogin
 } from "../controllers/userController";
 
 const globalRouter = express.Router();

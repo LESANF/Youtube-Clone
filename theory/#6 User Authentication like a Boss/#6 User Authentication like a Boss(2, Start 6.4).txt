@@ -1,0 +1,37 @@
+세션을 설치하자 npm install express-session
+
+app에 express-session을 import, 이니셜전에 app.use(session({}));
+
+session안에는 필수적으로 들어가는 옵션이있음. = secret, 옵션들은 여러가지가 있다 쿠키나 도메인을 원하는 대로 바꾸거나 유효한 기간설정에 대해
+
+그중에서도 필수적으로 해야하는게 secret이다. secret은 무작위 문자열로서 쿠키에 들어있는 session ID를 암호화하기 위한 것임.
+
+예를 들어 session ID를 전송할 때, 실제로 그 ID값 그대로 보내는 것은 아님. 실제로는 암호화된 상태로 보낸다. 누군가 정보를 알게 되는걸 원치않으니까.
+
+이 secret에는 어떤 문자열이든 넣어줘도 동작함. https://randomkeygen.com/ ( 이싸이트에서 가져와서쓰자 )
+-> 나는 mWWga9RygQpDHcV4U5rdrDA3xTTMGgqT를  사용할거임.
+
+그리고 이 문자열을 바로 secret : 에 넣어주는게 아니라 env에 넣어서 환경변수로 쓸거임. 왜냐면 누군가 이 문자열을 보지않아야 하기때문. 보면 쿠키를 해독할 수 있게 됨.
+
+.env로 이동해서 COOKIE_SECRET이라는 변수 생성.
+
+app.use(
+  session({
+    secret: process.env.COOKIE_SECRET,
+    resave: true,
+    saveUninitialized: false
+  })
+);
+
+이렇게 session을 사용하여 필수적인 옵션인 secret을 추가하였다. secret말고 강의에서 문구가떠서 추가해준 옵션이있는데 나는 안뜬다. 그래도 강의를 따라 넣어보자
+
+resave는 세션을 강제로 저장하게 되는거. true로 값줌, saveUninitialized는 초기화되지않은 세션을 저장소에 저장한다. 새로운 세션이지만 변경되지 않은 세션은 초기화되지 않는다.
+
+로그인 세션에 이용하려면 false를써라. false로 값줌.
+
+서버를키고 로그인해보면 COOKISE에 connect.sid로 쿠키가 만들어져있는걸 확인할 수 있다. value는 암호화 되어있는것이고 이건 userid임.
+
+내가 웹브라우저를 새로고침 할 때마다, 즉 이 정보를 웹서버로 전송할 때마다 서버에서는 passport 인증과정을 호출하고 
+
+passport는 deserialize를 통해 내가 어느 사용자인지 식별할 수 있게 된다.
+
