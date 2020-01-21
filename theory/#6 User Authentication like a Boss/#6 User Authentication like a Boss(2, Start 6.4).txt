@@ -37,3 +37,113 @@ passport는 deserialize를 통해 내가 어느 사용자인지 식별할 수 �
 
 header.pug에서 임시로 썻던 isAuthenticated는 이제 없으니까 if !user 조건만 남겨둔다.
 
+로그인을하면 header가 업로드, 프로필, 로그아웃으로 바뀔것이고. req.user를 확인해보면 누가 무슨 요청을 하는지 알 수 있다. 
+
+이제 req.user는 이 어플리케이션 어디든 존재하는거임. 이게 가능한 이유는 쿠키때문.
+
+connect.sid (우리가 inspect로 보고있는 쿠키)는 express로 보내지고 있다. express는 session을 이용함으로써, 쿠키를 가지게 되는거다.
+
+그리고 passport.session을 통하여 session을 이요하는데, 즉 session이 가진 쿠키를 이용한다는거다.
+
+그리고 그 passport로 desirializeUser가 사용자를 확인하는거임.
+
+app.use(session({~~~})은 쿠키를 해독함. 해독되어서 ID가 1이다 라는 예처럼 알 수 있는거고. 그 ID는 passport.session()으로 넘어가게 됨.
+
+passport로 넘어가면 deseriailizeUser함수가 실행되고, 사용자를 식별하게 되면, passpor는 그 사용자를 middleware나 routes의 request(요청) object에 할당됨.
+
+그래서 어느 route에서든 로그인한 사용자가 누구인지 체크할 수 있다. 
+
+middlewares.js에 res.locals.user를 req.user || null로 바꾸자  {} 빈객체나 null이나 같음. 유저가 존재하지 않으면 null이 되겠지.
+
+서버를 재시작해보면 로그인이 풀려있음. <- 이건 문제임. req.user를 콘솔로 찍어보면 undefined되어있음 좋지않은 결과.
+
+다시 로그인해보자. 로그인도 되었고 header도 바꼇고 req.user로 로그인한 유저도 보임.
+
+그러나 서버를 다시 재시작하면 session이 사라짐 다시 로그인이 풀리고, 내가 서버를 매번 새로 실행시킬 때 마다 session 정보를 잃게됨.
+
+왜내면 session정보 (session({secret:~~blabla}), 쿠키 정보들을 우리의 메모리에 저장하고 있기 때문이다. 
+
+이런부분은 바꿔야함. 우리는 session이 유지되기를 바란다. 내가 서버를 잃거나 바꾸는 일이 있다고 해도.
+
+서버는 기억해야한다. 어느 사용자가 어느 쿠키를 가지고 있는지.
+
+===================================#6.4 END=====================================
+
+데이터베이스(MongoDB)를 사용해서 세션을 저장하자.
+
+connect-mongo를 사용할거임. 다운로드하자 npm i connect-mongo
+
+connect-mongo를 써서, session에게 데이터를 MongoStore라는 저장소에 저장할거임.
+
+다운받았으니 app.js에 import하자. 이제 사용이 가능함.
+
+const CokieStore = MongoStore(session); MongoStore는 session 오브젝트가 필요함으로 안에 session을 적음.
+
+그 다음으로, session 설정으로 와서, store를 추가하자.
+
+그전에 아래와같은 저장소를 mongo와 연결시켜야함. 이부분이 매우 중요한데, CokieStroe와 mongo간의 연결을 만들어줘야함. 
+
+그전에 mongoose를 써야한다. mongoDB와의 연결을 해주는 일은 mongoose가하니까. 
+
+아래와 같이 mongooseConnection은 mongoose.connection으로 연결 시킬 수 있다. (db.js를 연결시킬 수 있음)
+
+app.use(
+  session({
+    secret: process.env.COOKIE_SECRET,
+    resave: true,
+    saveUninitialized: false,
+    store: new CokieStore({
+      mongooseConnection: mongoose.connection // new CokieStore를 연결시키기 위한 연결 방법.
+    })
+  })
+);
+
+이제 js파일을 수정하거나 서버가 재시작된다고 하더라도, 쿠키를 계속 보존할 수 있고, 여전히 로그인 상태를 유지할 수 있다.
+
+서버를 재시동하면 로그인이 유지되어있다.
+
+아직 해결할 문제들이 몇가지 더 있는데  routes들로 출입을 제한하는것. 
+
+이미 로그인 된 사용자는 Join화면으로는 접근을 못하게 한다는 말. 직접 URL을 localhost:4000/Join으로 치면 지금은 접속이됨.
+
+이런식으로 되면안됨. 이미 로그인 된 사람이니까, 가입 화면으로 가는 건 허용되면 안됨.
+
+미들웨어를 하나 만들어서 설정하자. middlewares.js로 이동.
+
+export const onlyPublic = (req, res, next) => {
+  if (req.user) {
+    res.redirect(routes.home);
+  } else {
+    next();
+  }
+};
+
+다음과 같이 미들웨어를 하나 만듦. 유저가 로그인된상태라면 home으로 리다이렉트, 아니면 아무것도하지않고 next로 다음 경로로진입.
+
+이렇게 만들어진 미들웨어를 우리가 적용한 controller(함수)에 넣어주자.
+
+globalRouter로와서 만약 사용자가 로그인된 상태라면 JOIN과 LOGIN하면을 보게 하고 싶지 않게하자. 
+
+JOIN, LOGIN화면은 LOGOUT된 사람들만 볼 수 있음. join / login 루트들에게 onlypublic 넣어줌.
+
+잊지말자 우리는 passport와 session덕분에 req.user를 통해 로그인된 사용자가 누구인지 알 수 있는거임.
+
+그리고 editProfile, changePassword 는 사용자 전용이어야함. 이것에 대한 middleware도 하나만들자.
+
+export const onlyPrivate = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else {
+    res.redirect(routes.home);
+  }
+};
+
+로그인되어있는 상태어야지 프로필 수정과 패스워드 변경이 가능함. 아닐시 home으로 보냄.
+
+userRouter로와서 editProfile과 changePassword에 미들웨어추가. 미들웨어를 쓰려면 import 시켜줘야함. vsc는 똑똑해서 자동적으로 해줌 
+
+videoRouter로와서 업로드, 비디오수정, 비디오 삭제 역시 사용자 전용이기때문에, onlyPrivate추가.
+
+이런 설정이 보안의 첫걸음임. 
+
+===================================#6.5 END=====================================
