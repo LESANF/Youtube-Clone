@@ -35,3 +35,5 @@ resave는 세션을 강제로 저장하게 되는거. true로 값줌, saveUninit
 
 passport는 deserialize를 통해 내가 어느 사용자인지 식별할 수 있게 된다.
 
+header.pug에서 임시로 썻던 isAuthenticated는 이제 없으니까 if !user 조건만 남겨둔다.
+
