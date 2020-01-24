@@ -209,6 +209,109 @@ userController에서 githubLogin함수를 하나더만들자.
 
 ===================================#6.6 END=====================================
 
+이제 우리는 route를 만들자. 간단함. 접근하면 함수를실행해주는 route를 만들면됨
 
+누군가 '/auth/github 으로 오면, passport.authenticate('github')로 인증을 시킬거다.
 
+접근했을때 실행되는함수는 export const githubLogin = passport.authenticate("github"); 으로 작성.
 
+rotues.js에서 깃헙에 대한 루트를 만들어주자. 
+
+const GITHUB = "/auth/github";
+const GITHUB_CALLBACK = "/auth/github/callback";
+
+다음과같이 경로를 정해주고 const routes안에 
+
+github: GITHUB,
+githubCallback: GITHUB_CALLBACK 로 다시 객체로 넣어줌.
+
+그리고 passport로와서 백틱안에 routes.githubCallback으로 넣어줌.
+-> callbackURL: `http://localhost:4000${routes.githubCallback}`
+
+함수를 만들고 passport에 경로까지 잡아줬으니 routes를 적용하자.
+
+globalRouter로 와서 globalRouter.get(routes.github, githubLogin); 해주면됨.
+
+routes.github(/auth/github)로 들어가면 난 githubLogin함수를 써서 인증을 할거라는 의미.
+
+이러면 이제 인증이 진행되고, 완료가 되면 사용자는 callbackURL로 돌아오게된다.
+
+callbackURL로 접근했을때 함수가 실행되는 경로도 만들어줘야함 
+
+만약 사용자 인증이 잘되어서 정보를 전달받을 때, 사용자를 callbackURL로 데려올텐데, 그 말은 곧 사용자가 로그인된다는 뜻이고, 그곳에서 또 어딘가로 보내줘야한다.
+
+이를위한 함수가필요함. userController로이동해서 만들면됨.
+
+export const postGithubLogIn = (req, res) => {
+  res.send(routes.home);
+};
+
+다음과 같은 함수 생성. 그리고 githubcallback으로 접근했을때의 route도 globalRouter에 적어줌.
+
+globalRouter.get(
+  routes.githubCallback,
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  postGithubLogIn
+);
+
+* 정리 *
+
+view(템플릿, socialLogin.pug)부분을 보자. github, facebook 아이콘이 들어가있는 버튼이 있다.
+
+이버튼을 누르면 소셜가입을하게 진행되어야 함으로. button안에 a(href=routes.gitHub)링크를 달아주자
+
+이사람이 routes.gitHub로 갔을때, 그걸 처리해주는 router가 globalRouter에 있다. = globalRouter.get(routes.gitHub, githubLogin);
+
+그리고 우린 githubLogin을 실행시킬껀데 그것은 userControlloer에 있다. 
+
+export const githubLogin = passport.authenticate("github"); 를 실행시킴. 이게 실행된다는 의미는 passport.js에 우리가 만든 GithubStrategy를 이용하게된다는 거임.
+
+깃헙페이지로 갔다가 돌아올 때, 우리가 정의해놓은 callbackURL로 돌아오면서, 우린 사용자 정보를 얻게 될거야.
+
+globalRouter.get(
+  routes.githubCallback,
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  postGithubLogIn
+);
+
+이코드를보며 이해하자. 어떤 사용자가 우리가 정한 callbackURL(routes.githubCallback)로 접근을 했다면.
+
+우리는 passport.authenticate("github", { failureRedirect: "/login" })을 사용한다. 즉 여기에서 우리는 passport.js의 new GithubStrategy에있는 githubLoginCallback 함수를 실행하게된다.
+
+로그인 과정이 성공적이고, 깃헙로긴콜백함수가 문제없이 결과를 리턴하면.
+
+우리는 postGithubLogin을 실행하는데, 이건 사용자를 res.send(routes.home)으로 보내준다.
+
+------------------------------------------------------------------------------------------
+
+테스트해보자. 우리는 지금 로그인상태임. 근데 우리는 LOGOUT을 구현했음 손쉽게. req.logout();으로 
+
+우리가 사용하고있는 passport는 아주 훌륭하기 때문에, req.logout();만 쓰면 쿠키 등등을 전부다 처리해 줄거다.
+
+그리고 globalRouter에 logout경로에 미들웨어를 넣자 onlyPrivate. 로그아웃은 onlyPrivate임.
+
+로그아웃은 처리됐으니, 깃헙으로 가입하기를 해보자. 버튼을누르면 /auth/github URL로 링크되어있음.
+
+누르면 깃헙에서 사용자에게 정보를 넘길거냐는 확인창을 볼 수 있음. 승인을 누르면
+
+어플리케이션이 인증되었다고 보여지지만, localhost를 기다리고 있다고 되어있음(계속 로딩중)
+
+왜냐하면 passport가 githubLoginCallback을 실행시켰기 때문. 이 함수 내용을 적기전 우리는 일단 console.log로 보기위해 내용을 작성하지않았기 때문에 진행이안되는거.
+
+우리가 받은 정보들을보자
+
+accessToken은 5a717e2a95a294f7b00787b008029c819592c1ca 이부분임.
+
+refreshToken은 아무것도없다 undefined
+
+profile은 id: '54767632', displayName: null, username: 'LESANF', 부터시작해서 JSON등등 많은 양의 내용.
+
+그리고 cb = callback function은 [Function: verified] 확인됐음.이라고 콘솔에 찍힘. 그러면 나는 사용자를 만들었고, 누군지 알고있고, 확인도 했어라고 해주면된다.
+
+다시한번 이번강의를 정리하면,
+
+우린 사용자를 깃헙으로 보냄 -> 깃헙에서 승인하면 -> 깃헙은 우리가 알려준 callback URL로, (callback과 함께) 사용자를 돌려보냄 여기까지했음.
+
+깃헙은 우리가  사용자 정보를 받았다고 말해줄때까지 대기함. 이부분이 githubLoginCallback의 내용이고 아직 정의하지않음.
+
+===================================#6.6 END=====================================
