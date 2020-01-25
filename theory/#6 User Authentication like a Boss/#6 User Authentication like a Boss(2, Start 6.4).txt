@@ -314,4 +314,84 @@ profile은 id: '54767632', displayName: null, username: 'LESANF', 부터시작�
 
 깃헙은 우리가  사용자 정보를 받았다고 말해줄때까지 대기함. 이부분이 githubLoginCallback의 내용이고 아직 정의하지않음.
 
-===================================#6.6 END=====================================
+===================================#6.7 END=====================================
+
+githubLoginCallback 함수의 내용을 작성해보자 인자로받는 accessToken과 refreshToken에 대해서는 신경쓰지 않을거임.
+
+우리에게 중요한건 githubID, 이메일, 이름, 그리고 아바타(프로필사진)이 있음. 이런 정보들은 profile._json에 들어있음.
+
+const {
+    _json: { id, avatar_url, name, email }
+  } = profile;
+
+다음과같이 profile에서 id, avatar_url, name, email을 가져올거임.
+
+그리고 await를 쓰기위해 async를 추가.
+
+우리가 알아야될게 하나있는데 해당함수에서 인자로받는 cb= 콜백펑션은 passport에서 제공된 callback함수임.
+
+그리고 passport에서, 이 콜백 함수는 언제 호출되냐면, 인증에 성공한 상황에서 호출이 되어야함
+
+아래와 같은 코드는 github startegy를 제공하는 passport의 공식문서임.
+
+ function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ githubId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+
+이부분에서 user를 찾거나(find) 생성(create)할거임. 그다음에는 두 가지 경우가 가능함.
+
+return cb(err, user); 한가지는 cb를 호출할 때 에러 없이, user를 넣어주는 것. 에러가 없다고 하고, user object를 넣고 함수를 호출하면,
+
+passport는 우리가 사용자를 찾았다고 알게됨. 그러면 passport는 user ID를 쿠키에 넣어줄 거고, username+password(local방식) 인증할 때와 똑같은 걸 해줄거임.
+
+만약 user object없이 err만 넣어서 cb함수를 호출하면, passport는 우리가 사용자를 찾지 못한 걸로 알게된다.
+
+try catch구문에서 error를 catch했을때 우리는 return cb(error)을 해줄거임.
+
+이제 try구문에서 우리는 user를 찾게할거임. const user로 선언해서 그안에 비동기 구문으로 담자.
+
+const user = await User.findOne({ 깃헙으로온 email과 동일한 email을 가진 사용자들을 });
+
+email : email 사용자의 email과 깃헙으로부터 온 email이 동일한가. = email만 써도됨.
+
+함수에 들어가는 매개변수 중, 사용하지 않는게 있을 때(accessToken, refreshToken) _ , __ (언더바로 대체가능) 만약 없애버리면 profile, cb만 남는데 
+
+이렇게 하면안됨. 이건 profile과 cb가 accessToken과 refreshToken의 위치로 가게된다.
+
+지금 정의해놓은 user를 console.log(user)로 찍어보면 null이 나옴.
+
+조건문을 제시하자. 만약에 그 동일한 email을 가진 사용자를 발견하면, 그 사용자의 정보를 업데이트하는것이다.
+
+어떤 사용자가 가입은 되어 있는데, (이메일+패스워드로 가입되어있다고 가정 / 깃헙에 nagong100@gmail.com 로 가입되어있다고 예를들자)
+
+내가 이 이메일로 가입을 한 뒤에, 깃헙으로 로그인 하기를 클릭하면, 난 그 사용자를 로그인 시킬거다. 왜냐하면 그 이메일을 쓰는 동일인이니까 말야
+
+그러니까, 내가 만약 그 email을 쓰는 사용자를 찾는다면, 난 그냥, 그 사용자의 정보를 조금 갱신할거다.
+
+그래서, 그 이메일을 가진 사용자를 찾으면, 이 사람이 패스워드 넣어서 로그인을 하든 뭘 하든 그 사람의 githubId(user.githubId)를 깃헙에서 가져온 id(_json.id)로 할당할거임.
+
+이렇게 쿠키에 저장하게된다.
+
+user.githubId = id;
+user.save(); 
+return cb(null, user); 해준다.
+
+이메일 동일한 사용자를 찾았을 때, cb함수를 호출해주고 첫번째 매개변수는 에러없음(null), 두번째 매개변수는 user.를 인자로주면 찾았다고 말해주는거다.
+
+만약 사용자를 찾지 못했다면, 게정을 하나 만들어줘야함.
+
+ const newUser = await User.create({
+      name,
+      email,
+      githubId: id,
+      avatarUrl: avatar_url
+    });
+    return cb(null, newUser);
+
+다음과같이 동일한 이메일을 찾지 못했을때 새롭게 만드는방법이다.
+
+이제 테스트를해보자. 깃허브 로그인을 누르면 로그인되는걸 확인할 수 있다.
+
+===================================#6.8 END=====================================
