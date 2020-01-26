@@ -1,0 +1,87 @@
+* 인증에 대한 정리 *
+
+< local 방식 >
+
+username + password를 이용한 방식 ( local 방식 )은 비교적 간단함.
+
+username + password를 post 방식으로 전달하고, 우리가 설치해준 플러그인인 mongoose가 자동으로 체크를 해줘.
+
+만약 password가 맞으면, passport에게 맞다고 알리고 그럼 passport는 쿠키를 생성하지.
+
+< github 방식 >
+
+깃헙 인증의 경우 조금 다르다.
+
+먼저, 사용자는 깃헙 웹사이트로 이동하게 돼 (거기에서 권한 승인을 함)
+-> globalRouter.get(routes.gitHub, githubLogin); / githubLogin이 인증을 해주는 함수다.
+
+그 이후 깃헙 웹사이트는 우리에게 그 사용자의 정보를 보내주는데 /auth/github/callback 이라는 URL로 오게 돼.
+-> routes.githubCallback
+
+그렇게 되면, passport가 함수를 호출하는데 우리가 만들어준 githubLoginCallback이라는 함수가 실행돼.
+
+이 함수는 모든 정보를 받을 거다. 사용자의 profile같은 거를. 이 정보로 email로 사용자 찾기, github ID로 사용자 찾기등을 할 수 있음.
+
+githubLoginCallback 함수의 한 가지 조건은 callback(cb)함수를 return 해야한다. 
+
+cb함수를 실행시켜야하고 그 함수에 error가 있는지 user가 있는지를 알려줘야함. 
+
+error가 존재하면 cb(error), passport는 에러가 있구나. user는 없는 거구나 하고 끝내버릴거고 
+
+user가 존재하면 cb(null, user), passport는 이 user를 취해서, 쿠키를 만들고 쿠키를 저장한다. 그리고 이 저장된 쿠키를 브라우저로 보내게된다.
+
+error가 존재하면 passport.authenticate("github", { failureRedirect: "/login" }), 로그인으로 보내버릴거고 cb(null, user) user가 존재하면 githubLoginCallback을 처리할거다.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+*camel case = 소문자로 시작하되 다음 단어부터는 첫글자를 대문자로 표기하는법 ex) findOne
+
+이제 profile 페이지를 만들거다. 그전에 header를 잠시 수정하자.
+
+현재 profile(User detail)을 누르면 현재 로그인한 사용자의 프로필로 가도록 되어있음. 잘되어있음.
+
+일단 userDetail.pug를 작성해보자. 그리고 userController로와서 userDetail함수를 수정하자.
+
+userDetail에서는, 특정 id를 가진 사용자를 찾아야만 한다. (http://localhost:4000/users/5e2bea2b6ebd4a498cf93183) 이것처럼. users/사용자id
+
+사용자를 찾고, try catch를 써서 찾은 user를 보내고 해야하는데 사실 그 사용자는 로그인 되어있는 상태이다.
+
+그러니까 /users/${id}보다 /users/me로 하는게 좋은 방법일거같다. 그러기위해서 me를 만들어야하고 새로운 route를 만들자. 
+
+이름은 me. 나자신을 의미. 
+
+이렇게 만드는 이유는 나는 사용자마다 똑같은 user template를 사용할텐데, 해당 id를 가진 사용자를 userDetail함수에서 찾도록 하는게 싫기 때문.
+
+userController에 me라는 함수를만들고, userDetail이 하는일과 같은 일을 시킬거다. 
+
+다른점은 userDetail에서는 사용자를 찾는 과정이 필요할 텐데, me에서는 user를 req.user로 전달할거다. 바로 지금 로그인한 사용자를 말이지.
+
+기억해야한다. req.user는 현재 로그인 된 사용자다.
+
+그래서, 이제 내 userDetail 페이지는 user라는 object를 전달받았다.
+
+이제 userDetail.pug로가서 img안에 user.avatarUrl를 넣어주자. github의 이미지를 불러올 수 있음. req.user를 객체로 받았으니까.
+
+block content
+    .user-profile
+        .user-profile__header
+            img.avatar(src=user.avatarUrl)
+            h4.profile__username=user.name
+
+
+다음과같이 userDetail의 block에 img를 넣어줬다 객체에서 전달받은 avatarUrl을 통해. 그리고 이름도 받아옴.
+
+만약 로그아웃하고 local방식으로 로그인하면 이미지가 안뜰거임. github의 프로필-아바타url을 받아온거기 때문!
+
+
+
+
+
+
+
+
+
+
+
+
+

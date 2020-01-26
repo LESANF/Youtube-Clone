@@ -1,5 +1,3 @@
-import { videoDetail } from "./controllers/videoController";
-
 // Global
 const HOME = "/";
 const JOIN = "/join";
