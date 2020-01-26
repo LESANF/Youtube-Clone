@@ -43,7 +43,6 @@ export const githubLoginCallback = async (_, __, profile, cb) => {
     _json: { id, avatar_url: avatarUrl, name, email }
   } = profile;
 
-  console.log(name);
   try {
     const user = await User.findOne({ email });
     if (user) {
@@ -72,7 +71,7 @@ export const logout = (req, res) => {
   res.redirect(routes.home);
 };
 
-export const me = (req, res) => {
+export const getMe = (req, res) => {
   res.render("userDetail", { pageTitle: "User Detail", user: req.user });
 };
 

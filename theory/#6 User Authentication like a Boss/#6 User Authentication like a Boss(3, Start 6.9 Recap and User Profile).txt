@@ -73,6 +73,43 @@ block content
 
 만약 로그아웃하고 local방식으로 로그인하면 이미지가 안뜰거임. github의 프로필-아바타url을 받아온거기 때문!
 
+그리고 header로 와서, routes.userDetail(user.id)로 가는 대신 routes.me로 가게하자. routes.me로 가도 문제가 없는 이유는
+
+우리의 middlewares에는 locals 변수인 user에 req.user를 할당했다는걸 기억해야한다. 그래서 주소의 id를 바꿔도 (현재 로그인 한) 똑같은 사용자의 프로필이 뜰거다.
+
+이건 middleware때문이다. user는 글로벌 변수로서, overriding하고 있기 때문임.
+
+이것은 userDetail은 제 역할을 못하고 있다는걸 의미한다.
+
+그래서 해당 id로 사용자를 찾고 만약 존재하지 않으면 존재하지 않는다고 띄워야함. 
+
+그러니까 지금 글로벌 변수인 user를 실제 로그인한 user로 바꿔야 되는것이다. 
+
+routes.me의 경로를 만들어주자 routes.js로 이동.
+
+const ME = "/me"; 그리고 객체안에 me: ME 로 추가시켜줌. 이러면 경로는 users/me로 표시된다.
+
+미들웨어를 조금 변경하자. res.locals.user를 res.locals.loggedUser로 변경해주자 훨씬 명확해졌음.
+
+header에서도 if !user를 if !loggedUser로 변경.
+
+me를 router에 추가시켜야함 localhost:4000/me니까 global에 넣어주자.
+
+그전에 me함수는 이름이 너무짧으니 getMe로 변경 그리고 다시 global에 경로추가 globalRouter.get(routes.me, getMe);
+
+me로 접근했을때 getMe가 실행되게.
+
+이제 profile을 누르면 routes.me로 가게해놨고, routes.me로 접근하게되면 getMe 함수가 실행되므로 현재 사용자프로필 객체를 이용할 수 있게됨.
+
+테스트하면 정상적으로 img와 name이뜸.
+
+이제 http://localhost:4000/users/2131231231 이런식으로 userDetail에 접근하면 에러가뜸.
+
+이제 user라는 이름의 글로벌 변수는 없으니까. img.avatar(src=user.avatarUrl) 같이 user라는 이름의 변수가 없음
+
+전에는 user라는 변수가 우리의 controller부터 전달받은 것인지 아니면, middleware로 인한 것인지 구분이 안됐는데 이제는 그런점을 해결했다.
+
+================================#6.9 END=======================================
 
 
 
