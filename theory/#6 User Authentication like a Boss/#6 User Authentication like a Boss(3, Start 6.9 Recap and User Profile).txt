@@ -115,8 +115,54 @@ me로 접근했을때 getMe가 실행되게.
 
 ================================#6.9 END=======================================
 
+/users/234234 같이 무작위 id로 들어갔을때 에러화면이 뜨게하는건 좋지않다. 이걸 수정할거임.
 
+userDetail 함수를 고쳐보자. try, catch구문을 써서 에러가 난 경우엔 home으로 redirect 시킬거임
 
+그리고 params로 id를 받자. const { params: { id } } = req; id는 /users/11111과 같이 1111부분이 id에 해당된다
+
+id인 이유는 우리가 routes.js에서 userDetail경로는 /:id로 지정해줬기 때문.
+
+await를 쓰기위해 async를 쓰고 const user = await User.findById(id); 사용자를 id로 찾자.
+
+그리고 userDetail을 render하면됨. user에는 우리가 방금 선언한 user를 넘겨주고.
+
+이제 페이스북 소셜가입 부분을 해보자. 
+
+passport의 페이스북 Strategy인 passport-facebook을 설치.
+
+https://developers.facebook.com/ 로가서 app을 등록시켜야한다.
+
+앱만들기후 -> 로그인설정 -> 웹을선택하고 -> http://localhost4000을 저장한다 (페이스북에게 우리의 사이트를 알리기위해)
+
+설정 -> 기본설정으로 가면 App ID와 App Secret키를 알 수 있음.
+
+내 ID와 Secret키를 .env에 변수로 넣어주자.
+
+FB_ID="181493373219656"
+FB_SECRET="a8cbe811d9b7f85fac4241fe717e74ba"
+
+그리고 facebook 인증방식을 사용하면됨. 공식문서에 제공된 것을보면 github방식과 거의 동일하다.
+
+이게 passport의 장점임. 모듈식으로 연결되어서 작동하고 일반적으로 strategy를 적용한 모양새가 서로 비슷하다.
+
+passport-facebook을 설치했으니 passport.js로와서 import해주자. 이제 적용이 됐고, 사용을하면됨.
+
+passport.use(new FacebookStrategy) 전과 비슷하게 몇가지 옵션(깃허브와 동일)이 필요함.
+
+그리고 routes도 만들어줘야함. 페이스북에 접근할때와 다시 돌아오는 콜백URL.
+
+선언한 경로들은 routes.js의 routes 객체에 넣어줌. 
+
+깃허브와 마찬가지고 함수들을 만들어 줄것이다. (3가지 순서대로 인증->콜백->로그인)
+
+3가지 함수를 만들었으면 globalRouter로 이동하여 경로도 추가해줌. 접근했을때, 인증을받고 콜백함수로 들어와 로그인연결까지의 경로
+
+이제 테스트를 해보자. facebook으로 소셜가입을 진행하면 콜백함수에 머물러있음 지금은 console.log로 파라매터들을 보게 작성했기때문.
+
+콘솔을 읽어보면 profile을 받았음. 하지만 이메일과 프로필사진은 받지못함.
+
+================================#6.10 END=======================================
 
 
 
