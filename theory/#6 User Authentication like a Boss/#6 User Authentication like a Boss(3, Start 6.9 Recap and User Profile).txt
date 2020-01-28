@@ -164,11 +164,68 @@ passport.use(new FacebookStrategy) 전과 비슷하게 몇가지 옵션(깃허�
 
 ================================#6.10 END=======================================
 
+우리는 사용자의 이메일 정보를 얻지 못했다. 지금 그 이유는 페이스북이 까다롭기 때문.
 
+developers.facebook으로와서 상태: 개발중 off를 on으로 바꾸자. 에러가뜰거임. 올바른 URL을 입력하라고 한다.
 
+개인정보처리방침에 passport-facebook링크를줌 아무링크나 줘도됨. 다시 on으로 바꾸고 카테고리를 고르고 진행하면 라이브상태로간다.
 
+앱 검수 -> 내권한및기능에서 email, default의 권한 기능을 승인해줌 ( 승인되어있음 더추가로 가능하지만 이것만으로 충분 )
 
+브라우저로 돌아와 페이스북으로 다시 진행을하면 URL에러가 뜰거임 그 이유는 우리 localhost는 HTTPS가 아니고 HTTP라 그렇다
 
+페이스북은 이런걸 좋아하지않음. HTTPS로 만들어야 로그인을 이어나갈 수 있지만, localhost로 HTTPS를 만드는방법은 쉽지않다.
 
+그래서 우리는 localtunnel이라는 것을 사용한다.(강의에서) 
+-> localtunnel이 안먹히는 관계로 ngrok를 설치함 -g로. 명령어는 ngrok http 4000 
+
+package.json의 scripts안에 "tunnel": "ngrok http 4000" 추가. 터미널에서 npm run  tunnel로 실행.
+
+https주소를 할당받아 passport.js의 new FacbookStrategy안에 callbackURL을 localhost에서 우리가 할당받은 https주소로 바꿔줌. (터널이 바뀔때마다 재할당받기때문에 서버를 끄지않을거임)
+
+이런부분은 facebook만 해당함 페이스북은 HTTPS같은 걸로 아주 성가시게 하기 때문.
+
+developers.facebook에서 facebook로그인 -> 설정으로 들어와서 유효한 OAuth 리디렉션 URI를 추가해줌 우리가 ngrok를 통해 할당받은 주소와 그주소의 콜백형태로 2개 추가.
+
+테스트해보면 email과 프로필 사진을 받아왔음.
+
+FacebookStrategy에 
+
+profileFields: ["id", "displayName", "photos", "email"],
+scope: ["public_profile", "email"]
+
+다음과같이 정보를 요청하면됨.
+
+이제 우리는 사용자 프로필을 얻게되었지만, ngrok를 껏다가 다시키면 새로운 주소를 할당받아야되고 그러면 다시 페이스북 로그인 - 설정으로들어와 OAtuh 주소를 수정해야함.
+
+================================#6.11 END=======================================
+
+정보를 받아왔으니 이제 facebookLoginCallback 함수로 user를 생성하자.
+
+github와 동일하게 복사-붙여넣기함 githubId -> facebookId로 수정
+
+프로필사진의 경우 페이스북은 graph API라고 하는것이 있는데 https://graph.facebook.com/2475906742537547/picture?type=large 이렇게 주소를 입력하면
+
+해당 사진을 다운받을 수 있음 id는 사용자 id 이게 바로 프로필 사진의 URL이 되는거임.
+
+github와 다른건 newUser의 avatar부분이 avatarUrl: `https://graph.facebook.com/${id}/picture?type=large` 이렇게 들어간다는거다.
+
+이제 콜백함수부분을 작성해줬고 테스트해보면 페이스북으로 소셜가입 진행이 성공적으로 된다. profile로 들어가면 프로필사진과 이름역시 성공적으로 받아옴.
+
+몽고디비에서 db.users.find({})를 해보면 3개의 아이디가 들어간게 보여짐 local, github, facebook 방식으로.
+
+만약 로컬방식과 facebook의 email이 같으면 find해도 2개만 보일거임. 왜냐면 로컬방식에 facebookId : 120310293012 이런식으로 추가만 될거임.
+
+newUser방식이아닌 그냥 user방식으로 save되기때문.
+
+이렇게되면 프로필 사진이 안뜰텐데 user방식에  avatarUrl: `https://graph.facebook.com/${id}/picture?type=large`를 추가해주면
+
+로컬에 페이스북이 추가되어도 프로필이 잘 뜰거임.
+
+이제부터 https 터미널을끄고 로컬방식, 깃허브방식으로만 로그인할거임 https연결을 어떻게 얻을 수 있는지 한번 해봤다 또 서버를 껏다 키고하면 
+
+주소를 다 수정해줘야해서 번거로움.
+
+================================#6.12 END=======================================
 
 
