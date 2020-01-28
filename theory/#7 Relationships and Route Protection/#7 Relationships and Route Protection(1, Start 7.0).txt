@@ -106,4 +106,44 @@ upload.pug로가서 form에 enctype="multipart/form-data"를 추가해야함. fo
 
 ==============================#7.1 END====================================
 
+이제 changePassword부분을 해보자. 이걸 하기위해 우리는 passport-local-mongoose의 changePassword를쓸거임.
 
+changePassword(oldPassword, newPassword, [cb]) 임.
+
+패스워드는 절대로 텍스트로 저장되지않고 암호화 되서 저장 됨.
+
+userController의 Changepassword함수도 get, post로 따로 만들어줌.
+
+만들어진 함수를 사용해야하니 userRouter로가서 수정하자 get, post형식으로 두 가지 경로를만들고 각자 getChange, postChange함수를 넣어줌.
+
+이제 postChangePassword함수를 작성해야함. 비동기식을 사용해야한다 비밀번호를 바꾸기전에 템플릿이 렌더되면안되니까.
+
+export const postChangePassword = async (req, res) => {
+  const {
+    body: { oldPassword, newPassword, newPassword2 }
+  } = req;
+  try {
+    if (newPassword !== newPassword2) {
+      res.status(400);
+      res.redirect(routes.changePassword);
+    } else {
+      await req.user.changePassword(oldPassword, newPassword);
+      res.redirect(routes.home);
+    }
+  } catch (error) {
+    res.status(400);
+    res.redirect(routes.changePassword);
+  }
+};
+
+위와 같은 코드는 passport-local-mongoose의 changePassword함수를 사용하며 만든 postChangePassword함수임.
+
+비밀번호를 바꾸기전에 home으로 돌아가면안되니 비동기구문을 사용했고, 받은 요청을 통하여 body에서 해당 인자들을꺼냈음
+
+if문은 비밀번호의 확인구문이고 실패했을시 상태를보내고 다시 비밀번호 변경화면으로
+
+비밀번호 확인이 됐으면, 비동기구문으로 changePassword함수를 통해 바꾸고 home으로 보냄.
+
+catch구문도 간단하다 error발생시 상태코드 보내고 다시 비밀번호 변경화면으로. 끝.
+
+==============================#7.2 END====================================
