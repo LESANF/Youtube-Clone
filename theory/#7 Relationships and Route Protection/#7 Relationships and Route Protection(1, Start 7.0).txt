@@ -1,0 +1,109 @@
+프로필에 스타일링을 조금 해보자.
+
+< github commit 7.0 복사 붙여넣기 스타일링 완료 >
+
+userDetail로 와보자.
+
+아래가 userDetail 코드임.
+
+block content
+    .user-profile
+        .user-profile__header
+            img.u-avatar(src=user.avatarUrl)
+            h4.profile__username=user.name
+        if user.id === loggedUser.id
+            .user-profile__btns
+                a(href=`/users${routes.editProfile}`)
+                    button ✏️ Edit Profile
+                a(href=`/users${routes.changePassword}`)
+                    button 🔒 Change Password 
+
+
+우리는 미들웨어를 가지고있음 loggedUser라는. req.user(현재 로그인한 사용자정보). 
+
+그리고 그 정보로 getMe함수에 user : req.user로 주고있지. 변수명 그대로 로그인한 사용자란 뜻임.
+
+유저가 로그인되어 있으면 템플릿은 loggedUser를 줌. 
+
+로그인 한 아이디(loggedUser.id)와 view가 찾은 아이디(user.id)와 같은지 보자. 그 의미는 같은 유저라는 뜻임.
+
+userDetail함수를 보면 params: {id}를 통해 id를 얻을 수 있음.
+
+현재 profile로 가보면 Edit Profile버튼과 change password버튼이 있는데 이건 loggedUser.id와 user.id가 같은경우임.
+
+현재 userDetail view를 뿌려주는 함수는 getMe와 userDetail임 두가지가있음 전자는 req.user를 user로 가지고있음 이점을 유의하자.
+
+후자의 user는 데이터베이스에서 id로 찾은 객체임. getMe로 받은 req.user는 loggedUser를 거치기때문에 if문에서 걸러질수밖에 없음.
+
+이제 직접 /users/다른id로 접속하면 아바타와 이름은 뜨지만 2개의 버튼은 보이지않음. 
+
+이런 원리로 editVideo버튼등을 처리해줄거임. 하지만 지금은 edit video의 작성자가 없기때문에 나중에 처리함.
+
+==============================#7.0 END====================================
+
+userController에서 editprofile 함수를 getEditProfile함수로 변경. 그리고 postEditProfile도 추가.
+
+userRouter로 가서 editProfile함수를 -> getEditProfile로 모두 변경후, userRouter.post(~~~)의 경로도 생성 물론 함수는 postEditProfile로 들어감.
+
+다시 userController로 돌아와서, getEditProfile은 내 이름하고 이메일을 반드시 보여줘야함.
+
+왜냐면 우리는 벌써 로그인한 유저를 가지고 있으니깐. editProfile.pug로 가서 input의 value값을 정해주자. get형식은 앞서 말한대로 값이 이미들어가있어야함
+
+우리는 현재 사용자로 로그인되서 프로필을 수정하는거기때문에 로컬의 loggedUser를 쓸수있음 이름과 이메일 input에 value를 정해주자 (loggedUser.email, name)
+
+아바타 부분도 바꿀 수 있게 해주자. 미들웨어를 만들어야함.
+
+const multerAvatar = multer({ dest: "uploads/avatars/" }); 경로를 잡아주고
+
+export const uploadAvatar = multerAvatar.single("avatar"); uploadAvatar를 export시켜주자.
+
+avatar인이유는 필드이름이 avatar이기때문. 
+
+미들웨어를 만들었으면 사용하자. userRouter로 이동 post에 uploadAvatar넣어줌. Video했던것처럼 똑같음.
+
+postEditProfile 함수에서 req로 받은정보를 사용해보자 Multer가 주는거임. const{...} = req;
+
+body에서 name, email 그리고 file의 path
+
+try,catch 구문과 async, await구문을 사용하고 error를 잡았을땐 다시 editprofile로 돌아가도록.
+
+여기서 돌아갈때 render를쓰는데 render는 템플릿을 불러오고 redirect는 URL로 돌아가는거임.
+
+export const postEditProfile = async (req, res) => {
+  const {
+    body: { name, email },
+    file
+  } = req;
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      name,
+      email,
+      avatarUrl: file ? file.path : req.user.avatarUrl
+    });
+    res.redirect(routes.me);
+  } catch (error) {
+    res.render("editProfile", { pageTitle: "Edit Profile" });
+  }
+};
+
+다음이 postEditProfile의 함수인데 req로 받은 데이터 (post로 넘겨주고 그 요청을 이함수에서 처리하는거임)
+
+req에서 body에있는 name, email과 file 그자체를 받음.
+
+try, catch로 처리하고 error났을땐 다시 editProfile을 render해줘야함. redirect아님. 템플릿을  받는거기때문.
+
+비동기구문으로 req.user.id (현재사용자의 id)를 찾으면서 name, email, avatarUrl을 findByIdAndUpdate 처리하는거임 몽구스 쿼리임.
+
+프로필을 수정할 때. avatarUrl : path 이런식으로 넣어주면. 내가 아바타사진을 수정안하고 넘겼을때 null로 간주하게 되기때문. 즉 이전껄 지운다는 말임.
+
+다시한번 정리하면 file이 있으면 file.path, 파일이 없으면 현재 아바타사진 즉 req.user.avatarUrl로 하면됨.
+
+여기까지 함수의 작성이 끝이남.
+
+upload.pug로가서 form에 enctype="multipart/form-data"를 추가해야함. form에서 파일을 넘길때 인코딩이 달라야하기때문.
+
+그리고 editProfile.pug에서 파일을 선택하여 넣을 input에는 accept="image/"를 넣어줌. 프로필에 이미지파일만 필요하기 때문.
+
+==============================#7.1 END====================================
+
+
