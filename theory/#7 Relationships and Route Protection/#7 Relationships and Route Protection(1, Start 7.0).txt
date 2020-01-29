@@ -147,3 +147,196 @@ if문은 비밀번호의 확인구문이고 실패했을시 상태를보내고 �
 catch구문도 간단하다 error발생시 상태코드 보내고 다시 비밀번호 변경화면으로. 끝.
 
 ==============================#7.2 END====================================
+
+업로딩할 때, 우리는 유저(작성자)없이 업로드하길 원하지 않음.
+
+Video.js 모델로와서 생성자를 추가해줌.
+
+creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
+
+ref는 어느 모델에서 온건지 알려주는거임.
+
+이와같은 생성자는 comment에도 필요하니 Comment.js에도 추가.
+
+그리고 User.js에는 비디오도 갖고, 자기가 만든 코멘트도 가짐. User는 comments:{}, Videos:{}를 가진다.
+
+이제 우리에게 필요한 것은. 비디오 크리에이터가 비디오를 만들 때, 크리에이터의 아이디를 저장할 필요가 있음. (Video.js의 creator에)
+
+그리고나서 video id를 videos array(User.js에있는 videos를말하는거임)에 넣을 필요가 있음. 
+
+videocontroller로 이동. postUpload를 조금 고쳐보자 newVideo를 만들때 creator : req.user.id 
+
+생성자는 현재로그인한 사람의 id를 넣어줌. ( 잊지말자 request안에 user객체가있음 ) 그리고 
+
+req.user.videos.push(newVideo.id);
+req.user.save(); 추가.
+
+우리가 한것을 요약해보면 지금 비디오를 크리에이터 id로 생성했고.
+
+그리고 또한 우린 이 video id를 비디오 안에 넣었음.
+
+현재 req.user를 console.log로 찍어보면 추가해놓은 comments, videos 배열이 빈배열로 잡힘.
+
+이게즉 req.user.videos와 req.user.comments를 의미함.
+
+req.user.videos에 push한다 newVideo.id를 그리고 save해줌.
+
+몽고DB에서 videos 보면 "creator" : ObjectId("5e2d4641960aeb5014aef00e")로 추가된걸 알 수 있음.
+
+이제 중요한 users를 데이터베이스에서 보자. 
+
+"comments" : [ ], "videos" : [ ObjectId("5e30efd43090d61fccb363c5") ], videos의 ObjectId는 
+
+다음과같이 추가해놓은 comments와 videos가보임. users는 videos array를 가지고있음. 그 배열안에는 newVideo.id가 들어있음.
+
+newVideo.id는 몽고DB에서 자동적으로 생성되는 id임.
+
+* 현재 나의 local방식 로그인 id는 5e310783fa99210828779917, 깃허브방식 로그인 id는 5e3025a20bfd3b35dcc4af03
+
+videoDetail 함수로가서 console.log(video)를해보자. 우리가 템플릿에 준거임.
+
+videoDetail.pug에서 by 사용자이름으로 업로드 됐다고 표시하자. 
+
+어떻게 우리는 누가 진짜 user인지 찾을 수 있을까 ? = populate() 함수를쓰자 이건 객체를 데려오는 함수임. 우리가 데려올건 creator
+
+우리는 populate를 object ID타입에만 쓸 수 있음. ex) mongoose.Schema.Types.ObjectID 이거말하는거임 
+
+Video.js모델을보면 creator객체를 가져올 수 있다 populate로
+->  const video = await Video.findById(id).populate("creator");   videoDetail함수에서 쓸거니까 여기에 객체를 가져옴 creator의 name에 쓰임
+
+creator는 여기서 더이상 id가 아니고 객체임 위와같이 populate한 video를 콘솔찍어보면 아래와같음.
+
+creator: {
+    comments: [],
+    videos: [ 5e310d61fa99210828779918 ],
+    _id: 5e310783fa99210828779917,
+    name: 'DONGHAN KIM',
+    email: 'nagong101@gmail.com',
+    __v: 1,
+    avatarUrl: 'uploads\\avatars\\0262ceb9ff92b177ce90f47d48617a32'
+  }
+
+보는것처럼 creator부분은 객체화됐고 이제 videoDetail.pug에서 video를 받았으니 creator.name을 쓸 수 있음.
+
+그리고 작성자를 눌러보면 userDetail(video.creator.id)를 통해 사용한 생성자의 프로필로 이동할 수 있다.
+
+이제 Edit video를 보호해보자. 내가 업로드한 비디오를 모든 사람이 edit 할 수 있으면 안되니까.
+
+editVideo버튼에 if문을 달아줌 video.creator.id === loggedUser.id로 올린사람이랑 현재 로그인한사람이 같을때만 edit할 수 있게.
+
+
+-----------------------------------------------------------*정리*-----------------------------------------------------------------
+
+Video, Comment 모델들은 creator, 즉 생성자를 가진다. 그 생성자들은 모두 User 모델에서부터 온다 ( ref="User" )
+
+User 모델은 videos와 comments 빈배열을 가짐. 그 배열들은 각각 id를 부여받고, Comment, Video모델로부터 온다.
+
+push를 통해 User의 videos에 id를 넣어줄거임 comments도 동일. 
+
+비디오를 생성할때 newVideo가 create에 의해 만들어지고 db에 저장된다.
+
+저장될때 creator : req.user.id 즉 현재 로그인한 사용자의 id를 부여받음.
+-> 현재 나의 local방식 로그인 id는 5e310783fa99210828779917, 깃허브방식 로그인 id는 5e3025a20bfd3b35dcc4af03
+
+local방식으로 로그인해서 비디오를 하나만들어봤다.
+
+videos: [ 5e310d61fa99210828779918 ] 다음과같이 videos에 newVideo.id가 들어갔음. newVideo.id는 몽고DB에서 자동적으로 생성되는 그 비디오의 id임.
+
+local방식으로 로그인한 유저가 생성한 video의 id를 가지게 된거임 ! 이를 바탕으로 Edit video권한을 줄 수 있다.
+
+만약 로그인한 id에 수정할 video의 id가 없으면 Edit Video버튼이 안보이게 하는거임 ! 수정할 권리를 없애는것.
+
+videoDetail.pug에서 비디오를 올린 사용자의 이름을 표시했으면 좋겠다. 이걸 해결하는 방법은 creator.id를 사용하는것.
+
+하지만 creator에는 req.user.id가 들어있음. 여기서 populate()라는 함수를 사용하자. 해당함수는 ObjectId 타입에만 쓸 수 있다. 
+
+creator의 type은 mongoose.Schema.Types.ObjectId이다.     
+
+const video = await Video.findById(id).populate("creator"); 이렇게 하면 이제 video는 DB에서 id로 객체를 찾고 그안에 creator는 id를 표기하는게  아니라
+
+객체를 표기하게된다.
+
+creator: {
+    comments: [],
+    videos: [ 5e310d61fa99210828779918 ],
+    _id: 5e310783fa99210828779917,
+    name: 'DONGHAN KIM',
+    email: 'nagong101@gmail.com',
+    __v: 1,
+    avatarUrl: 'uploads\\avatars\\0262ceb9ff92b177ce90f47d48617a32'
+  },
+
+이런식으로 creator이 객체형으로 나타나고 이를 이용하여 name을 쓸 수 있음. 
+
+그리고 videoDetail페이지에서 비디오를 올린사용자의 이름을 클릭하면 userDetail(video.creator.id)를 통해 해당 사용자의 프로필로도 이동할 수 있다.
+
+마지막으로 동영상에 대한 수정권한은  if video.creator.id === loggedUser.id / 현재로그인한 loggedUser와 비디오를 올린 사용자의 id가 같으면 수정할 수 있음.
+
+==============================#7.3 END====================================
+
+video를 수정할 수 없는 계정으로 로그인해보자 -> 비디오를 올린계정(local), 로그인한 계정(github) 이경우엔 edit Video를 볼 수 없음.
+
+하지만, 만약 내가 해커의 입장(깃헙로그인)이고 키를 알고 있으면 http://localhost:4000/videos/5e310d61fa99210828779918 (로컬로 로그인하여 올린 비디오)
+
+http://localhost:4000/videos/5e310d61fa99210828779918/edit 으로 해당 비디오의 수정페이지로 이동할 수 있음. 이런 접근을 막아보자.
+
+getEditVideo 함수로 이동해서 const video부분을보자. 우리가 찾은 비디오는 크리에이터의 id가 로그인한 id와 같지않으면, 
+
+그 의미는 video를 edit할 수 없다는 뜻이다. getEditVideo 함수를 수정해보자.
+
+if(video.creator !== req.user.id){ 로 조건을 줘서 진행할껀데 여기서 한가지 알아야함 지금 creator을 쓸때 이 creator은 id형식으로오는거임. 
+
+populate함수를 쓰지않아서 객체로 불러오는게 아님.
+
+try {
+    const video = await Video.findById(id);
+    if (video.creator !== req.user.id) {
+      throw Error();
+    } else {
+      res.render("editVideo", { pageTitle: `Edit ${video.title}`, video });
+    }
+  } catch (error) {
+    res.redirect(routes.home);
+  }
+
+다음과 같이 작성됨. 비디오의 사용자id와 현재 로그인한 사용자 id가 같지않으면 throw Error해줌. 
+
+try에서 에러를 발생시키면 자동적으로 catch로 가게됨.
+
+강제로 다시 /edit URL로 들어가면 home으로 튕겨나와짐. 
+
+deleteVideo도 보안해주자 아무나와서 삭제하면 안되니까. editVideo했던걸 가져와서 그대로 추가시키자.
+
+이제 프로필에서 이 사람의 비디오를 보고 싶을경우를 만들어보자. ( 누군가의 프로필을 볼 때 그사람이 올린 영상도 볼 수 있게 )
+
+css는 github Commit을 통하여 복붙
+
+userDetail에서 findById(id)로 정의해놓은 user를 콘솔로 찍어보자. videos array를 보여줄거임
+
+우리가 해야할건 const user = await User.findById(id).populate("videos");
+
+videos의 객체를 가져왔음 videos역시 ObjectId이기때문에 가능. 이제 내가원하는 객체를 가져왔음 userDetail템플릿에서 쓸 수 있다
+
+그이유는 우리는 res.render 해줬다 user를 
+
+프로필에서 해당 프로필사용자가 올린 비디오를 보게해주고 싶은거니 userDetail.pug로와서 
+
+ .home-videos
+            each item in user.videos 
+                +videoBlock({
+                    id:item.id,
+                    title:item.title,
+                    views:item.views,
+                    videoFile:item.fileUrl
+                })
+
+다음과같이 추가해줌. 기억해라 여기 each item에있는 user.videos의 user는 우리가 렌더해준 user임 
+
+==============================#7.4 END====================================
+
+
+
+
