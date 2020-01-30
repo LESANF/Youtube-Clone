@@ -1,0 +1,54 @@
+에러가 하나있음 내가 로그아웃하고 home에서 비디오를 선택하면 에러페이지로 가게되는데
+
+그 이유는  if video.creator.id === loggedUser.id 여기서 로그인한 유저가 없기때문. 로그인한 유저가 null임.
+
+videoDetail에서 조건문을 if loggedUser && video.creator.id === loggedUser.id 다음과같이 수정하면 정상작동.
+
+mixin을 우리 템플릿에 만들거임 videoPlayer를 만들기위해
+
+mixin폴더에 videoPlayer.pug로 mixin을 만들어주고 videoDetail에 include mixins/videoPlayer를 해줄거임
+
+그리고 css작업 css작업은 Gihub Commit을 통해 복사 붙여넣기해서 진행함.
+
+===============================#8.0 END=================================
+
+css를 입혀놨으니 기능을 넣어보자 
+
+assets->js->videoPlayer.js생성, main.js에 videoPlayer.js를 import해주자. videoPlayer에 함수를 만들어주자.
+
+videoPlayer.pug에서 전체 .videoPlayer클래스에 #jsVideoPlayer id를 부여, 그리고 플레이버튼에도 #jsPlayButton id부여.
+
+const videoContainer = document.getElementById("jsVideoPlayer");
+const videoPlayer = document.querySelector("#jsVideoPlayer video");
+const playBtn = document.getElementById("jsPlayButton");
+
+다음과같이 작업할부분을 JS로 받아옴.
+
+시작은
+
+if (videoContainer) {
+  init();
+}
+
+만약 videoContainer 즉 내가 getElementById로 받아온 jsVideoPlayer가 존재하면 init()함수 실행
+
+function init() {
+  playBtn.addEventListener("click", handlePlayClick);
+}
+
+실행된 init함수안에는 이벤트리스너가 들어와있음 마찬가지로 선언한 playBtn을 click했을때 handlePlayClick함수 실행
+
+function handlePlayClick() {
+  if (videoPlayer.paused) {
+    videoPlayer.play();
+  } else {
+    videoPlayer.pause();
+  }
+}
+
+만약 videoPlayer(video부분)이 paused 멈춰있으면 videoPlayer.play()함수에의해 실행이될거고 
+
+아닐경우(재생되고있는상황)는 videoPlayer.pause()에의해 정지됨.
+
+===============================#8.1 END=================================
+
