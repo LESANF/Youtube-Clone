@@ -52,3 +52,129 @@ function handlePlayClick() {
 
 ===============================#8.1 END=================================
 
+강의에선 document에 에러가들어옴 documnet is not defined. 하지만 2020/1/30일 기준 내가할때는 에러가안들어옴
+
+그래서 해당 에러에대한 eslint에 env추가는 하지않음.
+
+이제 play버튼을 눌러서 pause되었을때 icon도 일시정지 버튼으로 바꾸게 해줄거임.
+
+function handlePlayClick() {
+  if (videoPlayer.paused) {
+    videoPlayer.play();
+    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  } else {
+    videoPlayer.pause();
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  }
+}
+
+innerHTML로 해줄거고 위와같이 바꿈. 아이콘안에 " 쌍따옴표를 쓰고있기때문에 아이콘을 덮는건 ' 홀따옴표를 썻음
+
+재생버튼은 끝이났고 이제 볼륨버튼을 해주자.
+
+볼륨도 재생과같이 해줌 다른거는 paly()처럼 method 함수가아니라 프로퍼티. 요소로 해줘야함.
+
+볼륨의 아이콘이들어가있는 span에도 #jsVolumeBtn으로 id를 부여하고
+
+videoPlayer.js로 돌아와 const volumeBtn = document.getElementById("jsVolumeBtn"); 을  선언하고
+
+init에 클릭이벤트함수 추가 volumeBtn.addEventListener("click", handleVolumeClick);
+
+function handleVolumeClick() {
+  if (videoPlayer.muted) {
+    videoPlayer.muted = false;
+    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+  } else {
+    videoPlayer.muted = true;
+    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+  }
+}
+
+play버튼과 다른건 play(), pause()라는 method함수가아닌 muted = false, true. 프로퍼티로 부여한다는점.
+
+===============================#8.2 END=================================
+
+이제 마지막으로 풀스크린 관련해서 해보자. 
+
+버튼에 jsFullScreen id를 부여하고 마찬가지로 js에서 getElementById로 불러옴.
+
+FullScreen같은 경우 앞선 2개의 버튼과 다르게 체크할 함수가없음. 
+
+EventListener를 바꿔줘야함. 내가 풀스크린버튼을 한번만 누르면 난 이걸 전체화면으로 만들고, 그리고 난 EventListener를 바꿀거임 
+
+작게 만드는 기능을 넣게.
+
+fullScrnBtn.addEventListener("click", goFullScreen); 전체화면 버튼을 눌렀을때 goFullScreen 함수로이동.
+
+function goFullScreen() {
+  videoContainer.requestFullscreen();
+  fullScrnBtn.innerHTML = '<i class="fas fa-compress"></i>';
+  fullScrnBtn.removeEventListener("click", goFullScreen);
+  fullScrnBtn.addEventListener("click", exitFullScreen);
+}
+
+requestFullscreen()으로 하는대상은 videoContainer임 전체화면으로되면 비디오의크기도 수정해줘야함 scss로가서 video의 width도 100%해줌.
+
+눌렀을때 축소아이콘도 있어야하니 innerHTML로 아이콘을 바꿔주고 기존의 이벤트리스너를 제거해줌. 축소로 바꿔야하기 때문.
+
+그리고 전체화면에서 fullScrnBtn을 눌렀을 때, 축소되어야 하므로 클릭했을때 exitFullScreen으로 이동.
+
+function exitFullScreen() {
+  fullScrnBtn.innerHTML = '<i class="fas fa-expand"></i>';
+  fullScrnBtn.addEventListener("click", goFullScreen);
+  document.exitFullscreen();
+}
+
+축소가되면 다시 전체화면 아이콘이 보여야하니 아이콘을 넣어주고, 전체화면으로 가는 이벤트리스너를 또 다시 달아줌
+
+컨테이너를 requestFullscreen로 전체화면을 해주는데 축소는 다르다 document.exitFullscreen해줘야함.
+
+지금 그냥 requestFullscreen과 exitFullscreen을 하는데 강의에는 크롬이 옛날 버전이라 그런지 webkit을 붙여서했다. 나는 안붙여도 작동하니 그냥했음.
+
+===============================#8.3 END=================================
+
+exitFullScreen, goFullScreen 함수를 조금 수정했음 브라우저마다 적용 할 수 있게 if-else를 써서 수정해줌.
+
+이제 비디오플레이어의 시간부분을 해볼거임 현재시간과 총시간이 필요
+
+formatDate란 함수를 가져왔음. 복붙함 seconds를 파라매터로 받아서 시:분:초를 리턴받는 함수임.
+
+videoPlayer.pug로 이동
+
+시간부분을 현재, 총시간으로 나누고 span에 담자
+
+span#currentTime 00:00:00 
+|/
+span#totalTime 00:00:00
+
+id로 부를거기때문에 id를 각각 부여했고 | 는 태그로 인식되는걸 방지하기위해 / 앞에쓰는거임 결과적으로 00:00:00/00:00:00으로 입력됨.
+
+MDN에 HTMLMediaElement의 관하여 제공되는 함수 중 duration을 쓸거임.
+
+duration은 초단위의 미디어길이를 double값으로 리턴하는 것. 
+
+먼저우리는 duration을 video에 설정하고 얼마나 길게 play되었는지 보기위해 currentTime을 쓸거임.
+
+우린 currentTime을 얻고 그리고 나서 totalTime을 얻을거임 그리고나서 두개를 같이 셋팅.
+
+먼저 id를 부여한 span 2개를 getElementById로 가져오자.
+
+videoPlayer.addEventListener("loadedmetadata", setTotalTime);을 init에 넣어줌 이렇게하는이유는 비디오가 재생되야 정보를받아올 수 있음
+
+그에대한 이벤트로 loadedmetadata를 이용한거임. 이렇게 하지않으면 시간이 nan:nan:nan으로나옴 none은 숫자가 아니라는뜻
+
+먼저 총시간 부터 구할거임 (totalTime) setTotalTime으로 이동해서 totalTimeString으로 담고 videoPlayer.duration에서 얻은 실수를 우리가 가져온 formatDate에 넣어서 시:분:초로 받을거임
+
+받은 총시간을 innerHTML로 설정.
+
+이제 현재 재생되고있는 시간을 구할거임 currentTime.
+
+getCurrentTime함수를 만든다. currentTime은 구하기쉽다. 제공하는 미디어함수가있음 currentTime
+
+videoPlayer.currentTime을 formatDate로 가공해서 innerHTML로 넣어주면끝.
+
+근데 현재시간은 계속 변할거임 1초, 2초, 3초.... 그렇기때문에 1초마다 계속 getCurrentTime()함수를 호출해야함.
+
+setTotalTime() 함수안에서 setInterval(getCurrentTime, 1000);을 사용함. 1000은 setInterval에서 1초라는 뜻.
+
+===============================#8.4 END=================================
