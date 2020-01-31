@@ -178,3 +178,57 @@ videoPlayer.currentTime을 formatDate로 가공해서 innerHTML로 넣어주면�
 setTotalTime() 함수안에서 setInterval(getCurrentTime, 1000);을 사용함. 1000은 setInterval에서 1초라는 뜻.
 
 ===============================#8.4 END=================================
+
+videoPlayer.addEventListener("ended", handleEnded); 추가. ended는 비디오가 끝날때 발생되는 함수.
+
+function handleEnded() {
+  videoPlayer.currentTime = 0;
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+}
+
+끝났으니 현재시간을다시 0초로 맞춰주고 일시정지버튼을 다시 플레이버튼으로 바꿔줌 ( 재생될때는 일시정지버튼이지만 노래끝나도 일시정지 버튼인걸 방지하기위해 )
+
+볼륨 조절바를 만들어보자
+-> input.videoPlayer__volume#jsVolume(type="range", min="0", max="1", step="0.1" value="0.5")
+
+input 타입 range이고 안에는 옵션들임.
+
+===============================#8.5 END=================================
+
+볼륨 range에 대한 css 컨트롤 c+v 해옴.
+
+#jsVolume의 id를 range에게 부여하고 videoPlayer.js로 와서 꺼내씀.
+
+range를 조절했을 때의 이벤트를 넣어줌. ( handleDrag )
+
+function handleDrag(event) {
+  const {
+    target: { value }
+  } = event;
+  videoPlayer.volume = value;
+  if (value >= 0.6) {
+    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+  } else if (value >= 0.2) {
+    volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+  } else {
+    volumeBtn.innerHTML = '<i class="fas fa-volume-off"></i>';
+  }
+}
+
+인자로 event를 주는이유는 어디서 발생했는지 알아야되기 때문.
+
+value를 es6문법으로 event에서 뽑아서 사용하자.
+
+init()에   videoPlayer.volume = 0.5;를 넣어줌 이걸 넣어야 모바일에서 volume을 볼 수 있음.
+
+volumeRange.value = 0; 을 handleVolumeClick()의 else에 넣는이유는 넣지않으면 mute에 의해 버그가 생기기때문. 0으로 가게해줘야한다.
+
+그리고 if문에는 volumeRange.value = videoPlayer.volume;을 추가한다. 누군가 unmuted하려고 할때 넣어줘야함.
+
+muted되었다는 의미가 value값을 잊어버리게 하면 안됨. 그래서 추가하는거.
+
+range의 value가 min, max일때 up,off아이콘을 부여하고 그사이에 있을땐 down 아이콘을 부여함.
+
+===============================#8.6 END=================================
+
+

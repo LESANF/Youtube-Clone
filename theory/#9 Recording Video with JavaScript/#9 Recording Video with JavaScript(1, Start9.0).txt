@@ -1,0 +1,102 @@
+녹화기능을 넣을거임.
+
+레코딩 버튼을 누르면, 프리뷰화면을 통해 녹화를 진행할 수 있게 해줌.
+
+upload.pug에서 작업을 진행할거고 HTML을 좀 추가해보자.
+
+ .record-container#jsRecordContainer
+            video#jsVideoPreview
+            button#jsRecordBtn Start Recording
+
+다음을 .form-container에 포함시키고
+
+css로 버튼 위치와 preview를 검게만들어준다. 레코딩 시작하기전 가독성을 위해 배경을 검정색으로잡아줌.
+
+해당 HTML에 대한 scss파일을 partials에 생성해줌 videoRecorder.scss
+
+우린 stream을 카메로부터 얻을 꺼임. 그리고 그 stream을 video에 넣을거임.
+
+assets->js->videoRecorder.js를 생성 main에 import시켜주자.
+
+아래의 videoRecorder 파일을 살펴보자.
+
+const recorderContainer = document.getElementById("jsRecordContainer");
+const recordBtn = document.getElementById("jsRecordBtn");
+const videoPreview = document.getElementById("jsVideoPreview");
+
+const startRecording = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: { width: 1280, height: 720 }
+    });
+    videoPreview.srcObject = stream;
+    videoPreview.muted = true;
+    videoPreview.play();
+  } catch (error) {
+    recordBtn.innerHTML = "☹️ Cant record";
+    recordBtn.removeEventListener("click", startRecording);
+  }
+};
+
+function init() {
+  recordBtn.addEventListener("click", startRecording);
+}
+
+if (recorderContainer) {
+  init();
+}
+
+
+전체를 감싸는 jsRecordContainer, 레코딩시작하는 버튼jsRecordBtn, 프리뷰를 띄우는 jsVideoPreview까지 const선언하고 받아옴.
+
+버튼을 클릭했을때 startRecording함수를 시작할거고.
+
+이건 비동기식으로 진행해야함. 그리고 media API를 쓸거임.
+
+우리는 media를 user에서 부터 얻어와서 video에 넣을거임. 우리가 video도 얻어야 한다는 의미.
+
+media API중 MediaDevices.getUserMedia()를 사용할거임.
+
+try catch구문으로 진행할거고 어떤 사람은 권한을 통과하지 못할테니까
+
+에러가 발생했을때 버튼의 innerHTML을 수정해주고 레코딩을 하면안되니 클릭이벤트 리스너를 제거함.
+
+만약 접근을 허락시키면 awiat로 진행. 기다리는 이유는 user가 브라우저에게 권한에 대한 대답을해야함.
+
+auio나 video같은 권한을 물어볼거다. 그럼 접근하게해주면 try. 아닐시 catch. 접근을 위해 navigator 함수를 쓸거임.
+
+네비게이터는 브라우저와 관련된 정보를 컨트롤 한다. 브라우저에 대한 버전, 정보, 종류등 관련된 정보를 제공할거임.
+
+우리가 쓸 MediaDevices.getUserMedia() 함수안에 확인 객체로 audio와 video를줌 위와같은 코드에 보면됨. 
+
+video의 창사이즈도 조절할 수 있음.
+
+videoPreview.srcObject = stream; 이코드를 보자 video#jsVideoPreview는 video 태그임.
+
+하지만 보통 src="주소"형식으로 비디오를 넘겨주는데 우리는 src에 videoPlayer를 줄 수 없음.
+
+왜냐면 지금 레코딩하는건 파일이아님. console.log(stream)으로 찍어서 보면알겠지만 이건 객체(object)임.
+
+그래서 stream객체를 videoPreview에 .srcObject로 넘겨줌.
+
+videoPreview.muted = true;
+videoPreview.play();
+
+다음 코드의 .play()는 말그대로 재생이고 muted같은경우 
+
+오디오를 캡쳐해야함 비디오의 오디오를 하지만 마이크가 연결되어있으니 내 말소리는 들리지않게 하기위해 muted = true한거임.
+
+원래 getUserMedia()에서 권한받을 대상을 지금 
+
+audio: true,
+video: { width: 1280, height: 720 } 로해놨는데
+
+이건 내컴퓨터에 마이크, 캠이 설치되어있어야 권한에대한 창이떠지고 진행됨 연결이 안되어있으면 cant record로 바로넘어감.
+
+유의할것.
+
+==============================#9.0 END================================
+
+
+
