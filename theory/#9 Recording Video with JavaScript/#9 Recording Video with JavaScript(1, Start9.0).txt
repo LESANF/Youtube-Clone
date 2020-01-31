@@ -98,5 +98,109 @@ video: { width: 1280, height: 720 } 로해놨는데
 
 ==============================#9.0 END================================
 
+startRecording에서 try, catch구문을 지나고 removeEventListener를 삭제해줘야함.
+
+Start Recording을 시작했으면 클릭을 해서 stop후에 다시 start recording을 또 하는걸 원하지 않기 때문.
+
+그래서 catch후에 finally를 추가함 이건 try나 catch중 하나라도 실행되면 finally가 실행됨.
+
+finally에 recorBtn.removeEventListener("click", startRecording); 을 넣어주자. 
+
+만약 내가 권한을 얻었고 버튼이 Stop recording으로 바뀌거나 권한을 얻지못하여 Cant record로 버튼이 바꼈을경우
+
+버튼의 text만 바뀐것이지 버튼을 click 했을때 아직 startRecording이 살아있음. 그걸 없애기위해 finally를 추가하여 이벤트를 삭제하는것.
+
+나는 stop recording에서 눌렀을때 녹화된 파일을 저장하는 이벤트를 달아야하기때문에 위와같이 진행함.
+
+기존의 startRecording을 getVideo로 바꾸자 이때까지한건 비디오를 얻는 행위였음 녹화가아님.
+
+그리고 startRecording의 새로운 함수를 만듦.
+
+getVideo안의 stream은 010101같은 거고 우린 그걸 streamObject = stream;으로 다시 정의할거임. 
+
+전역변수로 let streamObject를 선언했으니 어디서나 stream을 쓸 수 있음.
+
+그리고 getVideo에서 try마지막구문에 startRecording(); 함수를 호출함. 
+
+이제 MediaRecorder()라는 함수를 다뤄보자. 제공되고있는 함수임. 이 함수는 media를 record하는거임.
+
+new MediaRecorder object는 레코드 하기 위해 MediaStream이 필요하다고 공식문서에 적혀있음.
+
+우리는 stream을 streamObject에 담아놨음 그리고 그 stream은 getVideo의 mediaDevices.getUserMedia를 통해 얻었음.
+
+startRecording함수에  videoRecorder = new MediaRecorder(streamObject);을 선언해줌.
+
+선언한 videoRecorder를 videoRecorder.start(); 이렇게 시작해야 데이터를 얻을 수 있음. 
+
+이로서 우리는 비트를 레코딩하고있는것이다. 이 비트에 접근할 수있지만 그걸로 무언가 하고있지않음. 비트를 어디로 보내야함.
+
+videoRecorder.addEventListener("dataavailable", handleVideoData); 다음과같이 dataavailable이라는 이벤트가 존재함.
+
+이건 videoRecorder안에 들어있는 ondataavailable이라는 놈이 있다는걸 인식할 수 있음.
+
+recordBtn.addEventListener("click", getVideo); 이것과 같은건 recordBtn.onclick = getVideo임.
+
+왜 addEventListener를 쓰냐, onclick은 단지 한개의 onclick 이벤트밖에 못가짐. 근데 나는 여러개의 onclick 이벤트를 넣을 수 있음.
+
+그게 addEventListener임. 만약 recordBtn.onclick = null을 하면 모든걸 삭제시킴 그래서 remove를씀.
+
+만약 어떤 객체(object)가 ondataavailable이라는 이벤트를 제공한다면 videoRecorder.addEventListener("dataavailable");라고 할 수있음.
+
+그래서 우리는 함수를 만들거다 const handleVideoData = event = {} 이런식으로. 
+
+videoRecorder.addEventListener("dataavailable", handleVideoData); 이걸통해 handleVideoData로 날림.
+
+==============================#9.1 END================================
+
+MediaRecorder는 레코딩이 다 끝나야 ondataavailable을 얻을 수 있음.
+
+dataavailable이벤트는 레코딩이 멈췄을때 handleVideoData함수로 이동하게됨.
+
+이벤트가 발생하면 우린 Blob을 얻는데 이건 0,1로 구성된 파일임. 일단 videoRecorder를 전역에서 쓸 수 있게 let으로 선언하자.
+
+우리는 레코딩을 멈춰줘야 파일을 받을 수 있으니 멈추는 함수를 만들자
+
+const stopRecording = () => {
+  videoRecorder.stop();
+  recordBtn.removeEventListener("click", stopRecording);
+  recordBtn.addEventListener("click", getVideo);
+  recordBtn.innerHTML = "Start recording";
+};
+
+다음과 같이 멈추는 함수를 만들었음.
+
+그리고 이함수에 접근하기위해 startRecording에 recordBtn.addEventListener("click", stopRecording);를 추가함.
+
+getVideo로 stream을 얻은상태로 startRecording으로 이동하여 그 stream을 이용해 MediaRecorder를 사용한다.
+
+그리고 레코딩이 시작되면 정보를 받을거고 recordBtn.addEventListener("click", stopRecording); 다음과같이 버튼을 눌렀을때 스탑레코딩으로 넘어감.
+
+스탑레코딩함수로 이동하면 videoRecorder.stop()으로 레코딩을 멈출거고 레코딩이 멈춤면 데이터를 받음
+
+handleVideoData에선 그데이터를 다운로드까지 이어주는 함수를만들어줄 거임.
+
+const handleVideoData = event => {
+  const { data: videoFile } = event;
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(videoFile);
+  link.download = "recorded.webm";
+  document.body.appendChild(link);
+  link.click();
+};
+
+dataavailable이벤트를 통해 handleVideoData함수가 event인자에서 data를뽑아냄 그 data를 videoFile이라고 변수명을 줬다.
+
+link변수를 정의하자 거기엔 a(앵커) 태그를 body에 생성해줄거임. link를 생성하는 이유는 download는 기본적으로 링크이기때문 
+
+link.href 주소는 = data즉 videoFile의 URL이어야함 그걸 URL.createObjectURL을통해 받아왔음.
+
+그리고 link.download = "recorded.webm" webm은 오픈소스이기 때문에 쓰는거고 recorded는 파일명임.
+
+이제 link(a)는 주소를가짐. 이걸 document.body에 자식요소로 넣을거임 body에 표시됨 그리고 link.click(); 을페이크로줌
+
+우리가 직접누르는게아님. 페이크로 넣어주면 a(link)를 클릭하라는 명령어고 명령어에의해 파일이 다운로드됨.
+
+==============================#9.2 END================================
+
 
 
