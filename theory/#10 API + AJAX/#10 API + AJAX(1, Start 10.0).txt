@@ -1,0 +1,143 @@
+조회수 올라가는 API를 구축해보자 
+
+비디오가 끝나면 views가 1씩 증가하게 해줄거임.
+
+Ajax를 사용할거임.
+
+비디오가 끝나면, JS에 전달해서 서버 URL로 가게하고 그 URL은 이 비디오가 시청됐다고 등록하게 됨. views가 1오르는 형태로.
+
+하지만 이건 브라우저에서 수정할 수 없음. 
+
+이건 single page application의 기본토대임. 기본적으로 다시 로드되지않음.
+
+웹사이트가 어디갔다가 돌아오는형태가 아니라 머물러있는거임. 그리고 뒷단에서 처리함.
+
+넷플릭스나 유튜브가 이런방식으로 돌아감. 유튜브를 보면 비디오를 선택해도 어디로 가지않음.
+
+내용을 바꾸긴하지만 어디로가버리는건 아님. JS가 video를 가져다가 보여주기 때문임. 이렇게 해주는게 ajax이다.
+
+ajax작업을 시작하기 전에 우리가 해야 할건 새로운파일을 우리 웹사이트에 추가해야함 그건 API view임.
+
+localhost:4000/videos/id. 로되어있는데 이건 템플릿을 렌더링 해준거임.
+
+이제 우리가 만들건 URL과 controller임 렌더링과 전혀 상관없음 이건 그냥 동작하고 http status code로 내가 답해주는 형식임
+
+routes로가서 새로운 routes를 만들자. 
+
+API는 그냥 server와 통신하기 위한 URL이 될거임. user가 접근 할 수 있는 url이 아님.
+
+user는 해당 API url을 찾을 수 없고, url에 어떤것도 렌더 할 수 없음.
+
+// API
+
+const API = "/api";
+const REGISTER_VIEW = "/:id/view";
+
+누군가 /api/12/view로 이동하면 우리는 view의 수를 하나 증가할거임. 
+
+이 경로는 유저가 어떤곳을 클릭해서 들어가는 그 라우터가 아님. 템플릿이 없으니까.
+
+객체에 추가시켜주자.
+
+라우터에 apiRouter.js로 파일을 만들어줌. 그리고 app.js에 경로를 정해주자. import apiRouter from "./routers/apiRouter"; 추가
+-> app.use(routes.api, apiRouter);
+
+videoController로가서 함수를 만들자 postRegisterView라는 함수.
+
+registerView는 video를 try,catch구문을 통해 찾을거임. 
+
+export const postRegisterView = async (req, res) => {
+  const {
+    params: { id }
+  } = req;
+  try {
+    const video = await Video.findById(id);
+    video.views += 1;
+    video.save();
+    res.status(200);
+  } catch (error) {
+    res.status(400);
+  } finally {
+    res.end();
+  }
+};
+
+위와같은 코드가 함수임. params를 통해 :id를 받아오고 그걸 토대로 비디오를 찾음.
+
+성공적으로 실행됐으면 실행코드200, views를 증가시키고 video를 저장함
+
+에러를 잡으면 코드400을 넘김. 그리고 try, catch중 아무거나 실행되면 finally로 들어가서 end() 함 요청을 끝낸다는 뜻.
+
+보다싶이 관련된 템플릿(view)가없고, 그냥 API view임 이 의미는 server하고만 소통한다는 뜻임.
+
+테스트해보자. http://localhost:4000/api/5e3115dc655f520b8ccebf65/view  비디오의 id를 직접넣어서 API의 주소에 넣어봤음 
+
+에러코드가 아무것도 뜨지않았고, 성공적으로 0 views에서 1 view로 코드가 작동한다. 
+
+해당 API주소를 새로고침한번 더해주면 2views가 됨.
+
+이게 내가 API를 만드는 방법임. 올바른 설정으로 visit할 url을 만들고 그들은 데이터베이스로 뭔가를 할거임.
+
+그냥 함수고, 렌더링을 안한다. 그냥 데이터베이스만 변경함. 
+
+API는 데이터베이스로 다른 서비스와 통신하기 위해 만들어진거임. 
+
+인스타그램이나 유튜브 페이스북도 API를 가지고있고 인스타그램을 예로들어서 사진을 업로드 하려고하면 인스타그램API를 사용하면됨.
+
+우리는 성공적으로 API를 만들었고 이건 우리의 비디오를 다봤을 시점에 붙일거다. 그리고 자동적으로 이 url을 뒷단에서 접근할거임.
+
+=============================#10.0 END===============================
+
+뒷단에서 URL에 접근하기 위해서는 frontednd로 가야함. videoPlayer.js에서 해보자 videoPlayer는 우리가 사용하고 싶은거니까.
+
+내가 하고싶은건 내 frontend 페이지에서 axios라는걸 import하고 싶어, 감사하게도 난 같은 걸 쓸거다. package.json이란걸 쓸거임.
+
+내 fronted/backend에다가. 만약 내가 이걸 큰 프로젝트에서 한다면, 나는 다른 frontend와 beackend를 갖길 원하겠지만
+
+우리의경우엔 일단 이걸로 만족하자. npm install axios;
+
+axios는 라이브러리인데. HTTP request요청을 멋지게 바꿔줌. 메뉴얼로 해주는거 대신에.
+
+메뉴얼로 url을 얻고싶으면 fetch("")하고 url을 ""안에 넣어주는거임.
+
+브라우저 콘솔에서 fetch("http://localhost:4000/api/5e3115dc655f520b8ccebf65/view")를 해주면 views가 올라감.
+
+axios는 comments부분에서하자. comments는 우리가 여기서 했던 거와 약간 비슷하게 추가 될거임.
+
+코멘트가 폼에 작성해서 보내고 새로고침되서 적용하는걸 원하지않음. 코멘트가 ajax(JS를 통해서 서버에 데이터를요청)로 작성되길 원한다.
+
+videoPlayer를 위해 fetch를 쓰고 comments를 위해서 axios를 쓸거임.
+
+videoPlayer로 돌아와서 함수를 생성.
+
+const registerView = () => {
+  const videoId = window.location.href.split("/videos/")[1];
+  fetch(`/api/${videoId}/view`, {
+    method: "POST"
+  });
+};
+
+fetch에서 조금 전과 다른부분을 찾을 수 있음. http://localhost:4000이부분이 없음.
+
+그이유는 우리는 getRequest를 가지고있기때문. 하지만 우린 POST방식으로 바꿔야함 코드와같이 
+
+왜냐면, 데이터베이스 변경할 필요가 없으면 get, 데이터베이스 변경할 필요가 있으면 반드시 post로 만들어야함.
+
+함수를 설명하기 앞서 split은 어떠한것을 기준으로 나눠주는거임 나눠진건 배열로 들어감. 
+
+이경우엔 /videos/을 기준점으로 줬음. 
+
+브라우저의 콘솔에서 window.location을 치면 브라우저의 정보안에서 href즉 URL을 얻을 수 있다.
+-> http://localhost:4000/videos/5e3115dc655f520b8ccebf65 이런 URL을 얻을 수 있음.
+
+split의 기준점으로 http://localhost:4000과 5e3115dc655f520b8ccebf65. 두 덩이를 얻을 수 있는데 이건 배열에 들어감.
+
+우리는 뒤에 id가 필요하기때문에 [1]번째 배열을 가져와서 videoId로 선언한 변수에 담아줌. ( 배열은 0부터시작 )
+
+여기까지하면 함수를 완성했고 이제 registerView()로 사용을해야됨. 
+
+비디오가 끝까지 재생했을때 해당함수를 실행해서 views를 1증가시킬꺼니까, function handleEnded()에 넣어줌.
+
+난 지금 API를 만든거임. controller는 렌더링없이 데이터베이스를 바꿨음.
+
+=============================#10.1 END===============================
