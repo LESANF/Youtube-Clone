@@ -141,3 +141,88 @@ split의 기준점으로 http://localhost:4000과 5e3115dc655f520b8ccebf65. 두 
 난 지금 API를 만든거임. controller는 렌더링없이 데이터베이스를 바꿨음.
 
 =============================#10.1 END===============================
+
+comment 부분을 하자.
+
+backend부터 처리하자. routes.js로가서 root를 만들어보자 view를 만들었던것 처럼.
+
+원한다면 controller를 하나 더 만들 수 있지만, comment가 그렇게 크지 않으니 그렇게 하지않을거임.
+
+const ADD_COMMENT = "/:id/comment"; 하고 객체에 addComent로 추가.
+
+videoController에서 작업하자. ( 댓글을 남기는건 videoDetail 이기때문. )
+
+정보를 보낼거니 post로 보내는걸 잊지말자.
+
+export const postAddComment = async (req, res) => {} 로 선언해주고 아래의코드와 같이 파라미터로부터 ID와 body의 comment를 얻자
+
+const {
+    params: { id },
+    body : { comment },
+    user
+  } = req;
+
+그리고 try,catch,finally를 사용. catch에 res.status(400)을 해줌. try를하던 catch를 하던 finally에는 res.end()로 끝내줌.
+
+일단 비디오를 먼저 얻어봄 video가 있는지 없는지 알아야하니. 그리고 comment를 만들필요가있음.
+
+Comment모델을 쓰기위해 import시키자. import Comment from "../models/Comment";
+
+try안에는 비디오를 findById로 찾고. newComment를 만들어준다.
+
+const newComment = await Comment.create; 이걸위해 Comment모델을 가져옴.
+
+짜여진 모델에 들어갈건 text와 creator, 그리고 comment는 Video 모델에도 포함되는걸 잊지말자.
+
+    const newComment = await Comment.create({
+      text: comment,
+      creator: user.id
+    });
+    video.comments.push(newComment.id);
+    video.save();
+
+다음코드를 보면 비동기식으로 newComment를 선언하고 Comment의 모델을 create함. create은 생성하고 DB까지 저장하는거임
+
+그럼 밑에 video.save()는 뭐냐고 할 수 있지만 위에 코드를 보면 설명된다.
+
+video는 findById로 Video모델에서 찾아온거고 comments는 애초에 Video모델을 짤때 넣어둔거임.
+
+그러니 선언한 newComment를 push로 데이터베이스에 넣어주고 save한거임.
+
+apiRouter로 가서 경로를 만들어주자. apiRouter.post(routes.addComment, postAddComment);
+
+video Detail로 가서 
+
+ul.video__comments-list
+                each comment in video.comments
+                    span comment.text 
+
+아래와 같이 리스트 추가.
+
+comments에 대한 객체도 필요함 videoDetail에서 populate("comments")로 받아오자.
+
+Video를보면 comments와 creator가 있지, 그것들의 내용을 가져오고싶으면 populate하면됨.
+
+예전개념 기억안날까봐 상기시킬겸 남김 each comment in video.comments / video.comments에서 comment를 하나씩 가져오겠다는거임
+
+*** 정리 ***
+
+백엔드 파트를 했고 postAdd를 하는데 id는 url에서 가져오고 comment는 body에서 얻어옴.
+
+video를 찾고 newComment를 생성하고 그리고 그 comment id를 video comment에 넣어줌.
+
+이게 다임. 내가 이해해야 하는 부분이 있는데, backend는 모든게 동작하는게 같음.
+
+params: {id}, body: {comment} 이건 우리가 form을 submit한거랑 똑같이 작동함.
+
+submit하는 모든거(upload video, change password, login같은 폼) 이건 액션이나 메소드가 없음. 왜냐면 이걸 JS하고 할거기때문.
+
+=============================#10.2 END===============================
+
+
+
+
+
+
+
+
