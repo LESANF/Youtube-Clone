@@ -264,11 +264,46 @@ video모델에는 comments가 있기때문. 그리고 video모델에 정보를 �
 
 =============================#10.3 END===============================
 
+댓글 추가를 fake로 만들자. 누군가 댓글을 달면 댓글을 페이크로 추가할거임.
 
+페이크 댓글이 추가되면 comments도 1씩 올라가게. 
 
+데이터베이스에서 확인되는 진짜 댓글이 아님. 하지만 axios의 status code를 listen할거고 code가 200이면 댓글이 추가됐다는거니까
 
+comments를 1올릴거임. 
 
+DOM 형태로 ul과 comment number가 들어있는 span을 가져옴.
 
+const commentList = document.getElementById("jsCommentList");
+const commentNumber = document.getElementById("jsCommentNumber");
 
+const addComment = comment => {
+  const li = document.createElement("li");
+  const span = document.createElement("span");
+  span.innerHTML = comment;
+  li.appendChild(span);
+  commentList.prepend(li);
+  increaseNumber();
+};
+
+li, span을 만들어주고 span에 인자로 받은 comment. 우리가 입력한 input.value를 넣어주고 그걸다시 li에 넣어줌.
+
+commentList.prepend(li)는 객체를 앞에써주는거임. 댓글을 남겼을때 최신댓글이 위에서부터 아래로 쌓여가야함 append를 쓰면 뒤에서부터 참
+
+그리고 가짜 댓글을 넣었기 때문에 숫자를 증가시켜줘야함 increaseNumber()로.
+
+const increaseNumber = () => {
+  commentNumber.innerHTML = parseInt(commentNumber.innerHTML, 10) + 1;
+};
+
+commentNumber(span)의 innerHTML은 기존 commentNumber.innerHTML에 +1해준거임. 가져온 innerHTML은 string형이니 parsInt로 number형으로 바꿈
+
+10은 10진수라는 뜻임.
+
+그리고 videoDetail로 이동해서 each comment in video.comments.reverse() 리버스를 하는이유는 새로고침 했을때 우리가 원하는것처럼
+
+최신의 댓글이 위에올라와있기 원함. 그래서 리버스해줌.
+
+=============================#10.4 END===============================
 
 
