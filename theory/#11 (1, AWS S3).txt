@@ -1,0 +1,78 @@
+AWS의 S3를 활성화 시켜보자.
+
+S3는 AWS의 서비스인데 파일을 업로드 할 수 있는 서비스임. 
+
+1. Create bucket으로 버킷생성
+
+버킷이름은 wetube
+
+지역은 도쿄로(서울과가까우니까)
+
+버킷은 AWS S3에서 폴더 같은거임.
+
+next-> next-> 모두 비활성화 -> create bucket을 누르면 버킷생성됨. (퍼블릭으로 만들었음)
+
+2. IAM으로와서 user를만들자. 
+
+user name입력하고 
+
+Access type은 programmatic access 이 의미는 이걸 프로그램이 사용하게 한다는거임.
+
+next-> 
+
+그룹을 정해줄거임 Attach existing policies directly를 누르고 s3를 검색하고 AmazonS3FullAccess로 정해줌.
+
+유저가 아마존 s3의 모든걸 볼 수 있게 해주는것임.  netx-> Create User 를하고 access key id와 secret access key를 받음.
+
+프로젝트의 .env에 아래와같이 넣어줌.
+
+AWS_KEY="AKIAT2GTW7EGFHPQ5U5Z"
+AWS_PRIVATE_KEY="pGCUhtUrQC3i46mIWpz849az2DCYiuorvfgpGwS2"
+
+-------------------------------------------
+                         
+npm i aws-sdk multer-s3
+
+미들웨어를 좀 바꿀거임. multer의 업로드 방식을 바꿀려고.
+
+multer-s3와 aws-sdk를 import.
+
+s3유저와 관련된 것들을 초기화 시켜줄거임. 
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_KEY,
+  secretAccessKey: process.env.AWS_PRIVATE_KEY
+});
+
+이제 초기화된 s3를 가졌음.
+
+const multerVideo = multer({
+  storage: multerS3({
+    s3,
+    acl: "public-read",
+    bucket: "yotubelesa/video"
+  })
+});
+
+s3는 우리가 초기화시킨 s3임.
+
+우리 controller가 fileUrl을 못받음. file:{ path } 가아닌 file: {location} 으로 수정해주자.
+
+mixins의 video.src또한 수정해줘야함 /https:// 이런식으로 나옴.
+
+https://github.com/nomadcoders/wetube/commit/866d0b953de815639d14bfc21aef290082751aa9 수정된링크
+
+이건 내서버에 유저의 파일을 저장하는것을 막기위한 행동임 aws s3에 저장하던가 다른 서버에 올리자.
+
+=============================S3 END========================
+
+11.2 Blob Duration Bug
+
+영상 totalTime에 대한 버그임.
+
+https://academy.nomadcoders.co/courses/435438/lectures/6938193
+https://github.com/nomadcoders/wetube/commit/c502a33b2f6efd68fc0562b2f50fcbb1906296c2
+
+영상과 업데이트된 코드임. 이외에 s3로가서 cors를 편집해야함 영상에도나옴
+
+==============================#11.2 END====================
