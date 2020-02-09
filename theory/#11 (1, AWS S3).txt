@@ -24,10 +24,8 @@ next->
 
 유저가 아마존 s3의 모든걸 볼 수 있게 해주는것임.  netx-> Create User 를하고 access key id와 secret access key를 받음.
 
-프로젝트의 .env에 아래와같이 넣어줌.
+프로젝트의 .env에넣어줌.
 
-AWS_KEY="AKIAT2GTW7EGFHPQ5U5Z"
-AWS_PRIVATE_KEY="pGCUhtUrQC3i46mIWpz849az2DCYiuorvfgpGwS2"
 
 -------------------------------------------
                          
