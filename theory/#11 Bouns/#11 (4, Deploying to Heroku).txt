@@ -1,0 +1,85 @@
+헤루코에 올리는과정이다 이제.
+
+맥 : brew install heroku/brew/heroku
+win : 홈피에서 다운로드
+
+그런다음 heroku login으로 로그인을 반드시 해야함.
+
+heroku login 명령어로 접근을하면 헤로쿠 웹페이지 로그인창이 뜸.
+
+그럼 로그인된거임.
+
+deploy(배포)할 준비가 되어있음.
+
+heroku create를 하면 heroku에 app을 만든거임. 깃헙주소가 제공됨.
+
+create로 만든 주소로 remote하자.
+
+git remote add heroku [깃헙주소]
+
+git remote -v로 remote된 주소들을 볼 수 있음.
+
+git push heroku master로 heroku에 push하는거임.
+
+아직 에러가 뜸. heroku logs --tail로 에러를 볼 수 있음.
+
+default로 build가 안된거임.
+
+start하기전 "prestart": "npm run build"을 package.json의 scripts에 넣어주자.
+
+앞선 에러는 /build/init.js를 찾을 수 없다고하는데 우리가 빌드를 하지않았으니 없는거다. prestart의 명령으로 이문제를 해결함.
+
+내용을 바꿨으니 add로 해야함
+
+git add .
+git commit -m "Preset"
+git push heroku master
+
+다시확인해도 에러가 뜰거임.
+
+babel을 찾을 수 없다는 에러가 뜰건데 @babel/cli가 있어야함 node, core, cli가 없으면 에러가 있을확률이 높음. ( npm i @babel/cli )
+
+다시 add를 해줘야함 내용이 바뀜
+
+git add.
+git commit -m "@BABEL"
+git push heroku master
+
+이제 babel에 대한 에러는 잡혔음. 여전히 작동은 안함. mongoose에 대한 에러가 뜰건데
+
+우리의 환경변수 .env에 담긴것들에 대해 문제가 생겨서그럼. 
+
+heroku는 git을 이용하는데 우리는 .gitignore에 .evn를 넣어놨음.
+
+그래서 우리는 환경변수를 설정할거임.
+
+헤로쿠 변수를 설정하려면 heroku confige:set 등등으로 그래서 
+
+heroku plugins:install heroku-config를 설치해줌.
+
+herogu config:push, pull 등으로 관리할 수 있음.
+
+heroku config:push를 해주면 .env가 다올라가있음 heroku config로 올라간 .env 환경변수들을 확인할 수 있음.
+
+이제 배포된 heroku 주소로 들어가면 정상작동함.
+
+환경변수가 heroku안에 있다는 뜻임.
+
+github 소셜가입에대한 에러가 발생하는데 passport부분을 고쳐야함.
+
+callbackURL을 수정하고 github에서 만들었던 apps에서 hompage URL을 heroku 주소로 바꿔주면됨.
+
+기억해야하는건 heroku가 npm start를 실행할거란거임.
+
+process.env.PRODUCTION ? process.env.MONGO_URL_PROD : process.env.MONGO_URL 이와같이
+
+내가 배포환경을 PROUCTION 설정해줬고 배포의경우라면 MONGO 아틀라스로 CONNECT했던 설정으로 아니면 기존에 했던 설정으로(내컴퓨터 안에설정한것)
+
+passport의 callbackURL또한 이런방식으로 설정함.
+->
+callbackURL: process.env.PRODUCTION
+        ? `https://polar-sea-27980.herokuapp.com${routes.githubCallback}`
+        : `http://localhost:4000${routes.githubCallback}`
+
+
+

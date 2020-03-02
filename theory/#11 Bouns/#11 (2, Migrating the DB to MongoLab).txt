@@ -6,9 +6,15 @@
 
 mongo Atlas에 가입.
 
+무료서버를 선택할때는 미국버지니아  선택.
+
 Network Access로 가서 Ip whitelist에 전체허용을 하고
 
-클러스터에 CONNECT로 들어가서 .evn에 있는 MONGO_URL의 내용을 몽고 아틀라스 커넥트 가이드에 따라 바꿔주자.
+클러스터 CONNECT선택시, username, password를 설정할 수 있는데 이게 env에  MONGO_URL_PROD로 넣어줄거임
+
+username:password가 포함된 주소임.
+
+클러스터에 CONNECT로 들어가서 .evn에 있는 MONGO_URL_PROD의 내용을 몽고 아틀라스 커넥트 가이드에 따라 바꿔주자.
 
 주의할건 아틀라스에 정한 아이디, 비밀번호를 넣어서 해줘야함. (.env에서 말하는거)
 

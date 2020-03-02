@@ -1,0 +1,81 @@
+빌드하기전 윈도우 사용자는 build:server에서 WEBPACK앞에 cross-env를 써줘야함.
+
+우리 서버 코드를 예전코드로 바꿔야함. 또한 예전코드로 실행이될거고 매우중요함.
+
+build라는 명령어를 만들거고 그것은명령어들로 구성되어 실행됨.
+-> "build": "npm run build:server && npm run build:assets && npm run copyAll",
+
+src폴더를 하나만들고 코드들을 모두 옮겨줌 (node_modules, package.json, package-lock.json, readME등을 제외)
+
+"build:server": "babel src --out-dir build --ignore 'src/assets','src/static','src/webpack.config.js'",
+
+이뜻은 src폴더 안에 있는 모든것을 build하라는 뜻임. out 밖에있는 dir 디렉토리인 build로.
+
+build되기전 static에는 main.js와 style.css가 있음. 
+
+npm run build:server로 시작하면 파일을 컴파일했다고 나옴 build폴더에 다들어가있음. 그리고 build폴더를보면
+
+views와 style.css가 없는걸 확인할 수 있음. 
+
+babel이 하는 일은 기본적으로 모든 js파일을 찾아서 compile해서 예전의 지저분한 코드로 바꿔주는거임.
+
+하지만 views와 static파일들은 담지않음. 
+
+그렇기 때문에 src/assets, sec/static/ srcwebpck.config를 넣어주는거임.
+
+이렇게 실행되면 webpack을 못찾음. src 폴더 안에있으니.
+
+"dev:assets": "cd src && cross-env WEBPACK_ENV=development webpack -w",
+
+기존 assets명령어에 cd src로 진입하는걸 잊지말자. 
+
+그리고 build된 것들은 .gitignore에 넣어야함.
+
+우리는 static 파일이 build/static에 담기도록 해야함.
+
+"prebuild": "rm -rf build" 라는 명령어를 추가해주자. 이건 build를 삭제해줄거임.
+
+우리가 build를 시작할때 build를 지우고 다시 build를 추가하는걸 확인할 수 있음.
+
+src에 있는걸 build에 넣어줘야함. views도 build에 넣어줘야 하는것처럼. 
+
+"build": "npm run build:server && npm run build:assets && npm run copyAll" 
+
+해당명령어의 마지막 명령어인 npm run copyAll은 우리가 정해둔 명령어이고.
+
+"copyAll": "cp -R src/static build && cp -R src/views build" 이건  (cp -R 뒤로나오는 경로를 시작으로 하위디렉토리까지 복사)
+
+src/static, src/views를 복사하는거임.
+
+이제 build하면 build 폴더에 static과 views가 들어가는걸 확인할 수 있음.
+
+"start": "PRODUCTION=true node build/init.js" 실행명령어를 적어줌. build안에있는 init을 실행시켜줄거임.
+
+원래의 node를 사용하는거. babel-node가아니라.
+
+만약 babel과 관련된 어떤 에러든 갖게 되면, @babel/core, @babel/node를 설치하자. (sh: babel: command not found는 npm install --save -dev @babel/cli)
+
+이렇게 실행하면 에러가 뜰건데 에러 내용은 regeneratorRountime is not defined가 뜰거임.
+
+이걸 예전에 해결했던 적이있음. async구문을 위해 설치했던 @babel/polyfill임.
+
+app.js로와서 import "@babel/polyfill"을 해주자.
+
+빌드를하고 서버를 켜보면. views에 home이 없다고 뜸. 
+
+우리의 views는 /src/views에 있음.
+
+app.js에 import path from "path"를 써줌 전체경로를 나타내는것.
+
+app.set("views", path.join(__dirname, "views")); 이렇게 views경로를 잡아줌.
+
+기존 src에 모든 코드를 넣었으므로 dev:server 역시 src/init.js로 잡아줌.
+
+express.static도 바깥 폴더의 static을 찾고있음. 기존 express.static("static")을
+-> app.use("/static", express.static(path.join(__dirname, "static")));
+
+다음과같이 바꿔줌 path.join(__dirname, "static"). 
+
+
+
+
