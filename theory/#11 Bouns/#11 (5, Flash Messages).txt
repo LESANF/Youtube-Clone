@@ -1,0 +1,68 @@
+express-flash 에대하여 할건데, 이것은 우리 유저에게 메시지를 보낼 수 있게 하는 모듈임.
+
+임시적으로 우리 html에 뭔가를 추가해주는 거임.
+
+npm install express-flash 로설치.
+-> https://www.npmjs.com/package/express-flash
+
+import flash from "express-flash"; (app.js에추가)
+
+사용하는건 app.use(flash());로 사용하면됨.
+
+JOIN(회원가입)때 password와 verify password가 같지않을때 메시지를 보게해보자.
+
+postJoin에서 진행될거임.
+
+postJoin으로 이동하여, password가 같지않을경우에
+
+req.flash("error", "Passwords dont match"); 이렇게 코드를 작성함.
+
+앞의 error은 타입이고 뒤의 Passwords dont match는 메시지임.
+
+꼭 error라는 타입이 정해진건아님. req.flash("potato", "message")도 가능함.
+
+html에서 부를땐 messages.potato 이런식으로.
+
+이것만하면 메시지가 안보일거임. 템플릿에 추가해줘야함.
+
+if messages.error
+            span=messages.error
+
+이런식으로 우리의 템플릿에 추가해야함 우리는(pug로 쓰고있음)
+
+app.use(flash()); 이 middleware가 무슨 역할이냐면, local messages를 사용할 수 있게 해주는거임.
+
+우리가 기존에 미들웨어에서 보내던 pageTitle, siteName과 같이 locals임.
+
+강제로 패스워드를 틀리게하고 Join Now를 누르면 템플릿에 추가한 메시지가 뜨는걸 볼 수 있음.
+
+어디론가 가면 메시지는 사라짐, 메시지는 메모리에 담겨있다가 매번 지워버림. 새로운 페이지를 요청할때마다...
+
+body에
+
+        if messages.error
+            span=messages.error
+        else if messages.info
+            span=messages.info
+        else if messages.success
+            span=messages.success
+
+이렇게 작성해주자. error, info, success가 존재하면 span으로 해당하는 타입의 메시지를 띄움.
+
+export const githubLogin = passport.authenticate("github", {
+  successFlash: "welcom",
+  failureFlash: "Can't log in. Check email and/or password"
+});
+
+이런식으로 깃헙로그인을 예로 들어보자 (로컬, 페이스북 동일함)
+
+{
+  successFlash: "welcom",
+  failureFlash: "Can't log in. Check email and/or password"
+}
+
+해당 부분을 추가시켰는데 의문이 들 수 있음. type이없다. type은 passport가 자동으로 정해줌 success가 되는거임
+-> pug에선 messages.success로 사용중.
+
+
+
