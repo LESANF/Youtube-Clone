@@ -64,5 +64,26 @@ export const githubLogin = passport.authenticate("github", {
 해당 부분을 추가시켰는데 의문이 들 수 있음. type이없다. type은 passport가 자동으로 정해줌 success가 되는거임
 -> pug에선 messages.success로 사용중.
 
+https://github.com/nomadcoders/wetube/blob/master/src/controllers/userController.js
 
+다음과같이 error, info, success인 경우에 대한 메시지를 각 컨트롤러마다 추가시켜놨음 
 
+이제 컨트롤러 실행시 메시지가 보임. 
+
+message.pug를 생성해 mixin을 만들어줌.
+
+mixin message(message={})
+    .flash-message__container(class=message.type)
+        span.flash-message__text=message.text 
+
+class=message.type은 우리가 mixin으로 보낼 info, error, success임.
+
+ +message({
+                type:'error',
+                text:messages.error
+            })
+
+이런식으로 info, success까지 총 3개를 넣어줌 main.pug에.
+
+해당 messages에 대한 css 처리 
+-> https://github.com/nomadcoders/wetube/commit/327cc22d53cb910c575c779b88339bc7ab15f967
