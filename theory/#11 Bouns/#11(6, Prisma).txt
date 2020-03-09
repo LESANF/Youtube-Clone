@@ -1,0 +1,107 @@
+prisma 가입
+
+services를 눌러 진행
+
+npm install -g prisma 이걸로 전역설치.
+
+prisma login -k eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjazdpc3QzcGU2Mzg2MDg2MXZhZm9tMzJ4IiwiaWF0IjoxNTgzNjU3NTM3LCJleHAiOjE1ODYyNDk1Mzd9.naXUvzhuRRH17ZnDfBViqSQgKSeNOAZlH9gqOXz6kSY
+
+bash에서 입력하여 로그인함.
+
+로그인이되면 창이 넘어갈거고 
+
+prisma init (변수명)으로 생성하고 해당 변수명으로 cs (변수명) 해서 접근하여 code .로 vsc를 통하여 켜줌.
+
+npm init으로 package.json만들어주고, datamodel.prisma를 살펴보자.
+
+모델을 우리가 작성해줄수있음. !는 required이고 @id는 유니크라는 뜻임.
+
+모델을 작성해줬으면 prisma deploy로 적용해주면 이제 prisma 홈페이지에서 서비스가 만들어진걸 확인할 수 있다. 모델을 추가하면 deploy를 또해야함.
+
+서비스와 내가가진걸 연결하려면 client가 필요함. prisma generate하면됨.
+
+생성할때 javascript로 만들면 generate가 미리 생성되서나옴.
+
+< 서버를 만들어서 연결해보자 >
+
+express를 설치 npm i express
+
+bodyParser.json()을 하는걸 잊지말자. npm i body-parser 설치후 import 하고 
+
+app.use(bodyParser.json())
+
+app.listen(3000)으로 3000포트로 불러오고 package.json에서 scripts로 start명령어를 만들어주자.
+
+기존은 "test" : ~~ 로 scripts에 들어있음.
+
+"start" : node . 으로 바꿔주면됨.
+
+서버를 켜보면 can not get/이 뜰꺼고 이는 연결된거임. 이제 prisma와 연결시켜보자.
+
+일단 import시키고 
+-> const { prisma } = require("./generated/prisma-client");
+
+app.get("/", async (req, res) => {
+  const posts = await prisma.posts();
+  res.json(posts);
+});
+
+이렇게 "/"으로 접근했을때 prisma.posts를 불러오도록 하자. 그리고 res한다 json으로 posts를.
+
+prisma-client-lib을 설치해야됨 안하면 에러가뜸.
+
+app.get("/:id", async (req, res) => {
+  const {
+    params: { id }
+  } = req;
+  const post = await prisma.post({ id });
+  res.json(post);
+});
+
+이런식으로 id를 받아와서 id에 해당하는 것도 보여줄 수 있음. ( 미리 prisma 홈페이지에서 직접 넣었음 )
+
+comment 모델을 만들어보자. datamodel.prisma로 이동하여 생성.
+
+type Comment {
+  id: ID! @id
+  Comment: String!
+}
+
+모델을 생성했으니 prisma deploy && prisma generate 로 적용.
+
+이제 모델을올리고 JS연결까지했으니, js파일에서 prisma.comments같이 우리가 등록만 모델에 접근할 수 있음.
+
+app.get("/comments", async (req, res) => {
+  const comments = await prisma.comment();
+  res.json(comments);
+});
+
+이런식으로 컨트롤러를 작성했고 해당정보를 가져오기전에 res.json으로 comments를 보내면 안되니 async awiat 비동기구문 사용.
+
+/comments로 접근하면 null이 뜸. 정상작동됨.
+
+app.post("/add-comment", async (req, res) => {
+  const { body } = req;
+  const newComment = await prisma.createComment({
+    comment: body.comment
+  });
+
+  res.redirect("/comments");
+});
+
+댓글을 추가하는 컨트롤러이고, create는 prisma에서 제공하는거고 우리가 생성한 모델에대한거임 우린 3개( User, Post, Comment )의 모델이있고 해당함수가 제공됨.
+
+createComment함수안의 내용은 모델의 구성요소인 comment에 우리가 요청(req)에서 받아온 body. 그리고 그안에있는 comment를 넣어주는 코드임.
+
+함수는 준비됐고, 이걸 보내려면 REST client를 사용해야함.
+
+https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo 
+
+구글 크롬에서 제공하는게 있다. 이걸이용함.
+
+실행하면 창이뜰거임 이걸로 POST request를 보낼 수 있음.
+
+http://localhost:3000/add-comment를 해당 앱에 넣어줌. 방식은 post
+
+그리고 파라매터셋팅에서 body는 apllication/json으로. Editor view역시 JSON visual editor로.
+
