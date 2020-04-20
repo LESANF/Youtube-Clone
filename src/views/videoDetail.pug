@@ -30,9 +30,9 @@ block content
                     |  comments
             form.add__comment#jsAddComment
                 input(type="text", placeholder="Add a comment")
-            ul.video__comments-list#jsCommentList
+            ul.video__comments-list.testdiv#jsCommentList
                 each comment in video.comments.reverse()
                    .video__coments-delete-container
                     li
                         span=comment.text 
-                    span.video__comments-delete#jsCommentDelBtn="❌"
+                        span.video__comments-delete#jsCommentDelBtn="❌"
