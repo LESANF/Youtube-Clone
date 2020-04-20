@@ -12,8 +12,12 @@ const increaseNumber = () => {
 const addComment = comment => {
   const li = document.createElement("li");
   const span = document.createElement("span");
+  const delSpan = document.createElement("span");
   span.innerHTML = comment;
+  delSpan.innerHTML = "❌";
+
   li.appendChild(span);
+  li.appendChild(delSpan);
   commentList.prepend(li);
   increaseNumber();
 };
