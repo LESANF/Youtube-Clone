@@ -1,6 +1,16 @@
+# Languages
+
+![issue badge](https://img.shields.io/badge/language-PUG-orange.svg)
+![issue badge](https://img.shields.io/badge/language-CSS-informational.svg)
+![issue badge](https://img.shields.io/badge/language-JS-yellow.svg)
+
 # Youtube-Clone
 
 Cloning Youtube with Vanilla and NodeJS
+
+## Result    
+
+https://tranquil-journey-66023.herokuapp.com/
 
 ## Pages :
 
@@ -14,3 +24,8 @@ Cloning Youtube with Vanilla and NodeJS
 - [X] Upload
 - [x] Video Detail
 - [X] Edit Video
+ 
+## Result    
+
+https://tranquil-journey-66023.herokuapp.com/
+
