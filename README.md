@@ -3,6 +3,7 @@
 ![issue badge](https://img.shields.io/badge/language-PUG-orange.svg)
 ![issue badge](https://img.shields.io/badge/language-CSS-informational.svg)
 ![issue badge](https://img.shields.io/badge/language-JS-yellow.svg)
+![issue badge](https://img.shields.io/badge/language-Node-peru.svg)
 
 # Youtube-Clone
 
@@ -24,8 +25,4 @@ https://tranquil-journey-66023.herokuapp.com/
 - [X] Upload
 - [x] Video Detail
 - [X] Edit Video
- 
-## Result    
-
-https://tranquil-journey-66023.herokuapp.com/
 
