@@ -9,6 +9,11 @@
 
 Cloning Youtube with Vanilla and NodeJS
 
+## Design Pattern(MVC)
+- Model
+- View
+- Controller
+
 ## Result    
 
 https://tranquil-journey-66023.herokuapp.com/
