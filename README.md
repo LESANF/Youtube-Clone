@@ -11,6 +11,9 @@ Cloning Youtube with Vanilla and NodeJS
 
 ## Design Pattern(MVC)
 - Model
+  - 1.1
+
+
 - View
 - Controller
 
