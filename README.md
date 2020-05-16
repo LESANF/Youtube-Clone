@@ -13,7 +13,7 @@ Cloning Youtube with Vanilla and NodeJS
 - `Front-End`는 `Vanilla JS`로 구현
 - `Back-End`는 `Node.js`를 사용하며 웹서버 구축에 사용된 웹프레임워크는 `Express`를 사용
 - `JS` 파일들의 네트워크 병목현상을 최소화 하기위해 `webpack` 모듈 번들러 사용
-- `CSS`는 `webpack`을 이용하여 `SCSS`파일을 변환하여 
+- `CSS`는 `webpack`을 이용하여 `SCSS`파일을 변환하여 적용
 
 ## Design Pattern(MVC)
 - ### Model
