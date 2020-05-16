@@ -11,8 +11,10 @@ Cloning Youtube with Vanilla and NodeJS
 
 ## Design Pattern(MVC)
 - Model
-  - 1.1
-    - 1.1-1
+  - 데이터스키마를 관리하는 데이터베이스는 MongoDB
+  - JS와 MongoDB의 연결은 Mongoose를 사용
+  - 만들어지는 스키마는 총 세 개 (댓글, 사용자, 비디오)
+  - MongoDB는 MongoDB Atlas로 관리되며, 영상과 이미지파일들은 인터넷 스토리지 서비스인 Amazon S3에 저장
 
 
 - View
