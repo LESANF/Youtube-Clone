@@ -9,6 +9,9 @@
 
 Cloning Youtube with Vanilla and NodeJS
 
+## Summary
+- `Back-End`는 Node.js를 사용하며 웹서버 구축에 사용된 웹프레임워크는 `Express`를 사용
+
 ## Design Pattern(MVC)
 - ### Model
   - 데이터스키마를 관리하는 데이터베이스는 `MongoDB`
@@ -17,7 +20,8 @@ Cloning Youtube with Vanilla and NodeJS
   - `MongoD`B는 `MongoDB Atlas`로 관리되며, 영상과 이미지파일들은 인터넷 스토리지 서비스인 `Amazon S3`에 저장
 
 
-- View
+- ### View
+  - express에서 View(template)는 `PUG`를 사용
 - Controller
 
 ## Result    
