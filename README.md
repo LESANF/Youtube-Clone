@@ -10,6 +10,7 @@
 Cloning Youtube with Vanilla and NodeJS
 
 ## Summary
+- `Front-End`는 `Vanilla JS`로 구현
 - `Back-End`는 Node.js를 사용하며 웹서버 구축에 사용된 웹프레임워크는 `Express`를 사용
 
 ## Design Pattern(MVC)
@@ -21,8 +22,10 @@ Cloning Youtube with Vanilla and NodeJS
 
 
 - ### View
-  - express에서 View(template)는 `PUG`를 사용
-- Controller
+  - `Express`에서 View(template)는 `PUG`를 사용
+  
+- ### Controller
+  - Data, 즉 `Model`을 보여주기위한 함수들의 집합으로 `JS`로 구현
 
 ## Result    
 
